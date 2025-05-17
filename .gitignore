@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.vscode/
+.idea/
+assets/Sample_BeeMoved_96kHz24bit.flac
+assets/*.flac
+assets/
