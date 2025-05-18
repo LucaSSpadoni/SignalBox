@@ -3,6 +3,9 @@ from PySide6.QtWidgets import (QMainWindow, QLabel, QWidget, QApplication, QVBox
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import QSizePolicy
+from app.spectrogram_page import SpectrogramPage
+from app.equalizer_page import EqualizerPage
+from app.pitch_shifter_page import PitchShifterPage
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -32,149 +35,11 @@ class MainWindow(QMainWindow):
         titleLabel.setStyleSheet("color: #8e44ad; font-weight: bold;")
         return titleLabel
     
-    def buildPitchShifterPage(self):
-        page = QWidget()
-        layout = QHBoxLayout()
-
-        # Left side
-        spectrogramWidget = QWidget()
-        spectrogramLayout = QHBoxLayout()
-
-        # label logic
-        spectrogramLabel = QLabel("Spectrograph Widget")
-        spectrogramLabel.setFont(QFont("Arial", 20))
-        spectrogramLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
-        spectrogramLayout.addWidget(spectrogramLabel)
-
-        # set layout
-        spectrogramWidget.setStyleSheet("background-color: #000033;")
-        spectrogramLayout.setAlignment(Qt.AlignLeft)
-        spectrogramWidget.setLayout(spectrogramLayout)
-        spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        # Right side
-        rightPanel = QWidget()
-        rightLayout = QVBoxLayout()
-
-        # label logic
-        rightLabel = QLabel("Pitch Shifter")
-        rightLabel.setFont(QFont("Arial", 20))
-        rightLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
-        rightLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        rightLayout.addWidget(rightLabel)
-        
-        # set layout
-        rightPanel.setStyleSheet("background-color: #000033;")
-        rightPanel.setLayout(rightLayout)
-        rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-
-        
-        # combine widgets into page layout
-        layout.addWidget(spectrogramWidget,3)
-        layout.addWidget(rightPanel,1)
-
-        # form page
-        page.setLayout(layout)
-        page.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        return page
-    
-    def buildEqualizerPage(self):
-        page = QWidget()
-        layout = QHBoxLayout()
-
-        # Left side
-        spectrogramWidget = QWidget()
-        spectrogramLayout = QHBoxLayout()
-
-        # label logic
-        spectrogramLabel = QLabel("Spectrograph Widget")
-        spectrogramLabel.setFont(QFont("Arial", 20))
-        spectrogramLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
-        spectrogramLayout.addWidget(spectrogramLabel)
-
-        # set layout
-        spectrogramWidget.setStyleSheet("background-color: #000033;")
-        spectrogramLayout.setAlignment(Qt.AlignLeft)
-        spectrogramWidget.setLayout(spectrogramLayout)
-        spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        # Right side
-        rightPanel = QWidget()
-        rightLayout = QVBoxLayout()
-
-        # label logic
-        rightLabel = QLabel("Equalizer")
-        rightLabel.setFont(QFont("Arial", 20))
-        rightLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
-        rightLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        rightLayout.addWidget(rightLabel)
-        
-        # set layout
-        rightPanel.setStyleSheet("background-color: #000033;")
-        rightPanel.setLayout(rightLayout)
-        rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-
-        
-        # combine widgets into page layout
-        layout.addWidget(spectrogramWidget,3)
-        layout.addWidget(rightPanel,1)
-
-        # form page
-        page.setLayout(layout)
-        page.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        return page
-    
-    def buildSpectrogramPage(self):
-        page = QWidget()
-        layout = QHBoxLayout()
-
-        # Left side
-        spectrogramWidget = QWidget()
-        spectrogramLayout = QHBoxLayout()
-
-        # label logic
-        spectrogramLabel = QLabel("Spectrogram Widget")
-        spectrogramLabel.setFont(QFont("Arial", 20))
-        spectrogramLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
-        spectrogramLayout.addWidget(spectrogramLabel)
-
-        # set layout
-        spectrogramWidget.setStyleSheet("background-color: #000033;")
-        spectrogramLayout.setAlignment(Qt.AlignLeft)
-        spectrogramWidget.setLayout(spectrogramLayout)
-        spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        # Right side
-        rightPanel = QWidget()
-        rightLayout = QVBoxLayout()
-
-        # label logic
-        rightLabel = QLabel("Right Panel")
-        rightLabel.setFont(QFont("Arial", 20))
-        rightLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
-        rightLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        rightLayout.addWidget(rightLabel)
-        
-        # set layout
-        rightPanel.setStyleSheet("background-color: #000033;")
-        rightPanel.setLayout(rightLayout)
-        rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-
-        
-        # combine widgets into page layout
-        layout.addWidget(spectrogramWidget,3)
-        layout.addWidget(rightPanel,1)
-
-        # form page
-        page.setLayout(layout)
-        page.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        return page
-    
     def createStack(self):
         stack = QStackedWidget()
-        stack.addWidget(self.buildSpectrogramPage())
-        stack.addWidget(self.buildEqualizerPage())
-        stack.addWidget(self.buildPitchShifterPage())
+        stack.addWidget(SpectrogramPage())
+        stack.addWidget(EqualizerPage())
+        stack.addWidget(PitchShifterPage())
         return stack
 
     def createNavBar(self):
