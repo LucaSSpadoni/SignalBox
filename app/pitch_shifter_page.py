@@ -9,24 +9,26 @@ class PitchShifterPage(QWidget):
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
         self.buildUI()
-
-    def buildUI(self):
-        # Left side
-        spectrogramWidget = QWidget()
-        spectrogramLayout = QHBoxLayout()
+    
+    def createSpectrographWidget(self):
+         # Left side
+        spectrographWidget = QWidget()
+        spectrographLayout = QHBoxLayout()
 
         # label logic
-        spectrogramLabel = QLabel("Spectrograph Widget")
-        spectrogramLabel.setFont(QFont("Arial", 20))
-        spectrogramLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
-        spectrogramLayout.addWidget(spectrogramLabel)
+        spectrographLabel = QLabel("Spectrograph Widget")
+        spectrographLabel.setFont(QFont("Arial", 20))
+        spectrographLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
+        spectrographLayout.addWidget(spectrographLabel)
 
         # set layout
-        spectrogramWidget.setStyleSheet("background-color: #000033;")
-        spectrogramLayout.setAlignment(Qt.AlignLeft)
-        spectrogramWidget.setLayout(spectrogramLayout)
-        spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
+        spectrographWidget.setStyleSheet("background-color: #000033;")
+        spectrographLayout.setAlignment(Qt.AlignLeft)
+        spectrographWidget.setLayout(spectrographLayout)
+        spectrographWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        return spectrographWidget
+    
+    def createRightWidget(self):
         # Right side
         rightPanel = QWidget()
         rightLayout = QVBoxLayout()
@@ -42,7 +44,10 @@ class PitchShifterPage(QWidget):
         rightPanel.setStyleSheet("background-color: #000033;")
         rightPanel.setLayout(rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        return rightPanel
 
+    def buildUI(self):
+        
         # combine widgets into page layout
-        self.layout.addWidget(spectrogramWidget,3)
-        self.layout.addWidget(rightPanel,1)
+        self.layout.addWidget(self.createSpectrographWidget(),3)
+        self.layout.addWidget(self.createRightWidget(),1)

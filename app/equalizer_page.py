@@ -10,7 +10,7 @@ class EqualizerPage(QWidget):
         self.setLayout(self.layout)
         self.buildUI()
 
-    def buildUI(self):
+    def createSpectrographWidget(self):
         # Left side
         spectrogramWidget = QWidget()
         spectrogramLayout = QHBoxLayout()
@@ -26,12 +26,14 @@ class EqualizerPage(QWidget):
         spectrogramLayout.setAlignment(Qt.AlignLeft)
         spectrogramWidget.setLayout(spectrogramLayout)
         spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        return spectrogramWidget
 
+    def createRightWidget(self):
         # Right side
         rightPanel = QWidget()
         rightLayout = QVBoxLayout()
 
-        # label logic
+            # label logic
         rightLabel = QLabel("Equalizer")
         rightLabel.setFont(QFont("Arial", 20))
         rightLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
@@ -42,7 +44,9 @@ class EqualizerPage(QWidget):
         rightPanel.setStyleSheet("background-color: #000033;")
         rightPanel.setLayout(rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        return rightPanel
 
+    def buildUI(self):
         # combine widgets into page layout
-        self.layout.addWidget(spectrogramWidget,3)
-        self.layout.addWidget(rightPanel,1)
+        self.layout.addWidget(self.createSpectrographWidget(),3)
+        self.layout.addWidget(self.createRightWidget(),1)

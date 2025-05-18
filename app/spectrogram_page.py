@@ -10,7 +10,7 @@ class SpectrogramPage(QWidget):
         self.setLayout(self.layout)
         self.buildUI()
 
-    def buildUI(self):
+    def createSpectrogramWidget(self):
         # Left side
         spectrogramWidget = QWidget()
         spectrogramLayout = QHBoxLayout()
@@ -26,7 +26,9 @@ class SpectrogramPage(QWidget):
         spectrogramLayout.setAlignment(Qt.AlignLeft)
         spectrogramWidget.setLayout(spectrogramLayout)
         spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        return spectrogramWidget
 
+    def createRightWidget(self):
         # Right side
         rightPanel = QWidget()
         rightLayout = QVBoxLayout()
@@ -42,7 +44,9 @@ class SpectrogramPage(QWidget):
         rightPanel.setStyleSheet("background-color: #000033;")
         rightPanel.setLayout(rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        return rightPanel
 
+    def buildUI(self):
         # combine widgets into page layout
-        self.layout.addWidget(spectrogramWidget,3)
-        self.layout.addWidget(rightPanel,1)
+        self.layout.addWidget(self.createSpectrogramWidget(),3)
+        self.layout.addWidget(self.createRightWidget(),1)
