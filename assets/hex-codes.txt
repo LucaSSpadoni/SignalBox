@@ -1,0 +1,4 @@
+grey - #71797E
+purple - #8e44ad
+light blue - #b0bec5
+Dark purple - #000033
