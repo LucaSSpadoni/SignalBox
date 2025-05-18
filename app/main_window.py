@@ -60,11 +60,11 @@ class MainWindow(QMainWindow):
         rightLabel = QLabel("Pitch Shifter")
         rightLabel.setFont(QFont("Arial", 20))
         rightLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
+        rightLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         rightLayout.addWidget(rightLabel)
         
         # set layout
         rightPanel.setStyleSheet("background-color: #000033;")
-        rightLayout.setAlignment(Qt.AlignRight)
         rightPanel.setLayout(rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
@@ -106,11 +106,11 @@ class MainWindow(QMainWindow):
         rightLabel = QLabel("Equalizer")
         rightLabel.setFont(QFont("Arial", 20))
         rightLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
+        rightLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         rightLayout.addWidget(rightLabel)
         
         # set layout
         rightPanel.setStyleSheet("background-color: #000033;")
-        rightLayout.setAlignment(Qt.AlignRight)
         rightPanel.setLayout(rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
@@ -152,11 +152,11 @@ class MainWindow(QMainWindow):
         rightLabel = QLabel("Right Panel")
         rightLabel.setFont(QFont("Arial", 20))
         rightLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
+        rightLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         rightLayout.addWidget(rightLabel)
         
         # set layout
         rightPanel.setStyleSheet("background-color: #000033;")
-        rightLayout.setAlignment(Qt.AlignRight)
         rightPanel.setLayout(rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
@@ -181,7 +181,6 @@ class MainWindow(QMainWindow):
         # create nav bar and add buttons
         navBar = QWidget()
         navLayout = QHBoxLayout()
-        #navLayout.setContentsMargins(10, 10, 10, 10)
 
         navBar.setStyleSheet("background-color: #000033;")
         navBar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
