@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSizePolicy, QFileDialog, QPushButton, QComboBox, QSlider
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt
-import matplotlib.pyplot as plt
+from app.audio_processor import AudioProcessor
 
 class SpectrogramPage(QWidget):
     def __init__(self):
@@ -17,6 +17,10 @@ class SpectrogramPage(QWidget):
         self.hopLengthValue = QLabel("Hop Length: 1")
         self.colorMap = QComboBox()
         self.fileLabel = QLabel("File: None")
+
+        # audio processor
+        self.audioProcessor = AudioProcessor(audio_file=None)
+        self.audioPath = None
 
         self.buildUI()
 
@@ -146,11 +150,15 @@ class SpectrogramPage(QWidget):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open Audio File", "", "Audio Files (*.wav *.mp3);;All Files (*)", options=options)
         if fileName:
             print(f"Selected file: {fileName}")
+            self.audioPath = fileName
+            self.audioProcessor.audio_file = fileName
 
             # Update label with selected file name
             fn = fileName.split("/")
             self.fileLabel.setText(f"File: {fn[-1]}")
-            # Here you can add code to process the selected file
+
+            # load audio file
+            audio, sr = self.audioProcessor.load_audio()
 
     def onInputSourceChanged(self, index):
         if self.inputToggle.currentText() == "Audio File":
