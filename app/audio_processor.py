@@ -17,7 +17,7 @@ class AudioProcessor:
             raise ValueError("No audio file provided.")
         
         # Load the audio file
-        self.signal, self.sample_rate = librosa.load(self.audio_file, sr=self.target_sample_rate, mono=True)
+        self.signal, self.sample_rate = librosa.load(self.audio_file, sr=self.target_sample_rate)
 
         return self.signal, self.sample_rate
 

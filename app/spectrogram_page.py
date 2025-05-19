@@ -2,6 +2,11 @@ from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSizePo
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt
 from app.audio_processor import AudioProcessor
+from app.spectrogram_plot import SpectrogramPlot
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import librosa.display
 
 class SpectrogramPage(QWidget):
     def __init__(self):
@@ -19,28 +24,37 @@ class SpectrogramPage(QWidget):
         self.fileLabel = QLabel("File: None")
 
         # audio processor
-        self.audioProcessor = AudioProcessor(audio_file=None)
         self.audioPath = None
+
+        # plotting
+        self.canvas = FigureCanvas(Figure(figsize=(5, 4)))
+        self.canvas.setStyleSheet("background-color: transparent;")
+        self.canvas.setContentsMargins(0, 0, 0, 0)
+        self.canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.canvas.hide()
 
         self.buildUI()
 
     def createSpectrogramWidget(self):
         # Left side
-        spectrogramWidget = QWidget()
-        spectrogramLayout = QHBoxLayout()
+        self.spectrogramWidget = QWidget()
+        spectrogramLayout = QVBoxLayout()
 
-        # label logic
-        spectrogramLabel = QLabel("Spectrogram Widget")
-        spectrogramLabel.setFont(QFont("Arial", 20))
-        spectrogramLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
-        spectrogramLayout.addWidget(spectrogramLabel)
+        spectrogramLayout.setContentsMargins(0, 0, 0, 0)
+        spectrogramLayout.setSpacing(0)
+        self.spectrogramWidget.setStyleSheet("background-color: #000033;")
+
+        # Add canvas to the layout
+        spectrogramLayout.addWidget(self.canvas)
 
         # set layout
-        spectrogramWidget.setStyleSheet("background-color: #000033;")
+        self.spectrogramWidget.setStyleSheet("background-color: #000033;")
         spectrogramLayout.setAlignment(Qt.AlignLeft)
-        spectrogramWidget.setLayout(spectrogramLayout)
-        spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        return spectrogramWidget
+        self.spectrogramWidget.setLayout(spectrogramLayout)
+        self.spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+        # return spectrogramWidget
+        return self.spectrogramWidget
 
     def createRightWidget(self):
         # Right side
@@ -133,6 +147,12 @@ class SpectrogramPage(QWidget):
         self.colorMap.currentIndexChanged.connect(self.onColorMapChanged)
         self.rightLayout.addWidget(self.colorMap)
 
+        # Add Visualize button
+        visualizeButton = QPushButton("Visualize Spectrogram")
+        visualizeButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        visualizeButton.clicked.connect(self.plotSpectrogram)
+        self.rightLayout.addWidget(visualizeButton)
+
         #return rightPanel
         return rightPanel
 
@@ -151,14 +171,10 @@ class SpectrogramPage(QWidget):
         if fileName:
             print(f"Selected file: {fileName}")
             self.audioPath = fileName
-            self.audioProcessor.audio_file = fileName
 
             # Update label with selected file name
             fn = fileName.split("/")
             self.fileLabel.setText(f"File: {fn[-1]}")
-
-            # load audio file
-            audio, sr = self.audioProcessor.load_audio()
 
     def onInputSourceChanged(self, index):
         if self.inputToggle.currentText() == "Audio File":
@@ -183,5 +199,87 @@ class SpectrogramPage(QWidget):
     def onColorMapChanged(self, index):
         # Placeholder for color map logic
         pass
+
+    def plotSpectrogram(self):
+
+        if not self.audioPath:
+            raise ValueError("No audio file selected.")
+        
+        # load audio file
+        processor = AudioProcessor(self.audioPath)
+        signal, sr = processor.load_audio()
+
+        # create normalized audio
+        signal = processor.normalize_audio()
+
+        # get parameters
+        n_fft = int(self.windowSize.currentText())
+        hop_length = self.hopLength.value()
+        color_map = self.colorMap.currentText()
+
+        # create spectrogram plot
+        plotter = SpectrogramPlot(signal, sr, axis_type="log", title="Spectrogram", xlabel="Time", ylabel="Frequency")
+        plotter.compute_spectrogram(n_fft=n_fft, hop_length=hop_length)
+        
+        # clear previous plot
+        #self.canvas.figure.clf()
+        fig = Figure(figsize=(5,4),dpi=100,facecolor='#000033')
+        canvas = FigureCanvas(fig)
+        canvas.setStyleSheet("background-color: transparent;")
+        canvas.setContentsMargins(0, 0, 0, 0)
+        canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        ax = fig.add_subplot(111)
+
+        ax.set_facecolor('#000033')
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+        img = librosa.display.specshow(plotter.data, sr=sr, x_axis='time', y_axis='log', ax=ax, cmap=color_map,hop_length=hop_length)
+        colorbar = fig.colorbar(img, ax=ax, format='%+2.0f dB')
+        colorbar.set_label('Amplitude (dB)', color='#b0bec5')
+        colorbar.ax.yaxis.set_tick_params(color='#b0bec5')
+        colorbar.outline.set_edgecolor('#b0bec5')
+        plt.setp(colorbar.ax.get_yticklabels(), color='#b0bec5')
+
+        # Style the plot
+        ax.tick_params(colors='#b0bec5')  # axis ticks
+        ax.spines['bottom'].set_color('#b0bec5')
+        ax.spines['left'].set_color('#b0bec5')
+        ax.xaxis.label.set_color('#b0bec5')
+        ax.yaxis.label.set_color('#b0bec5')
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#b0bec5')
+
+        # Clear previous plot if any
+        layout = self.spectrogramWidget.layout()
+        for i in reversed(range(layout.count())):
+            widget = layout.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)
+
+        layout.addWidget(canvas)
+        self.spectrogramCanvas = canvas
+
+    def onVisualizeButtonClicked(self):
+        try:
+            self.plotSpectrogram()
+        except Exception as e:
+            print(f"Error visualizing spectrogram: {e}")
+
+    def onSaveButtonClicked(self):
+        # Placeholder for save button logic
+        pass
+
+
+
+
+
+
+
+
+
+        
+
+
 
         
