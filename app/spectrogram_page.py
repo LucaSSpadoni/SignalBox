@@ -1,6 +1,7 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSizePolicy, QFileDialog, QPushButton, QComboBox
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSizePolicy, QFileDialog, QPushButton, QComboBox, QSlider
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt
+import matplotlib.pyplot as plt
 
 class SpectrogramPage(QWidget):
     def __init__(self):
@@ -9,8 +10,14 @@ class SpectrogramPage(QWidget):
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
+        # control panel
         self.inputToggle = QComboBox()
+        self.windowSize = QComboBox()
+        self.hopLength = QSlider(Qt.Horizontal)
+        self.hopLengthValue = QLabel("Hop Length: 1")
+        self.colorMap = QComboBox()
         self.fileLabel = QLabel("File: None")
+
         self.buildUI()
 
     def createSpectrogramWidget(self):
@@ -84,6 +91,44 @@ class SpectrogramPage(QWidget):
         rightPanel.setLayout(self.rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
+        # Window size label
+        windowSizeLabel = QLabel("Window Size")
+        windowSizeLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        windowSizeLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        self.rightLayout.addWidget(windowSizeLabel)
+
+        # Add window size dropdown
+        self.windowSize.addItems(["256", "512", "1024", "2048"])
+        self.windowSize.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.windowSize.currentIndexChanged.connect(self.onWindowSizeChanged)
+        self.rightLayout.addWidget(self.windowSize)
+
+        # Hop length label
+        self.hopLengthValue.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.hopLengthValue.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        self.rightLayout.addWidget(self.hopLengthValue)
+
+        # Add hop length slider
+        self.hopLength.setMinimum(1)
+        self.hopLength.setMaximum(512)
+        self.hopLength.setValue(1)
+        self.hopLength.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.hopLength.valueChanged.connect(self.onHopLengthChanged)
+        self.rightLayout.addWidget(self.hopLength)
+
+        # Color map label
+        colorMapLabel = QLabel("Color Map")
+        colorMapLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        colorMapLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        self.rightLayout.addWidget(colorMapLabel)
+
+        # Add color map dropdown
+        colorMapList = ["viridis", "plasma", "inferno", "magma", "cividis", "turbo"]
+        self.colorMap.addItems(colorMapList)
+        self.colorMap.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.colorMap.currentIndexChanged.connect(self.onColorMapChanged)
+        self.rightLayout.addWidget(self.colorMap)
+
         #return rightPanel
         return rightPanel
 
@@ -91,6 +136,9 @@ class SpectrogramPage(QWidget):
         # combine widgets into page layout
         self.layout.addWidget(self.createSpectrogramWidget(),3)
         self.layout.addWidget(self.createRightWidget(),1)
+
+        # Set initial visibility
+        self.onWindowSizeChanged(0)
 
     def openFileDialog(self):
         # Open file dialog to select audio file
@@ -111,3 +159,21 @@ class SpectrogramPage(QWidget):
         else:
             self.audioFileContainer.hide()
             self.micContainer.show()
+
+    def micRecorder(self):
+        # Placeholder for microphone input logic
+        pass
+
+    def onWindowSizeChanged(self, index):
+        n_fft = int(self.windowSize.currentText())
+        self.hopLength.setMinimum(n_fft // 8)
+        self.hopLength.setMaximum(n_fft // 2)
+
+    def onHopLengthChanged(self, value):
+        self.hopLengthValue.setText(f"Hop Length: {value}")
+    
+    def onColorMapChanged(self, index):
+        # Placeholder for color map logic
+        pass
+
+        
