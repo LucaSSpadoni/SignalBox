@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSizePolicy, QFileDialog, QPushButton, QComboBox, QSlider
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSizePolicy, QFileDialog, QPushButton, QComboBox, QSlider, QMessageBox
 from PySide6.QtGui import QFont
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QDateTime
 from app.audio_processor import AudioProcessor
 from app.spectrogram_plot import SpectrogramPlot
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -147,11 +147,31 @@ class SpectrogramPage(QWidget):
         self.colorMap.currentIndexChanged.connect(self.onColorMapChanged)
         self.rightLayout.addWidget(self.colorMap)
 
+        # Add Axis Type label
+        axisTypeLabel = QLabel("Axis Type")
+        axisTypeLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        axisTypeLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        self.rightLayout.addWidget(axisTypeLabel)
+
+        # Add Axis Type dropdown
+        axisTypeList = ["linear", "log"]
+        self.axisType = QComboBox()
+        self.axisType.addItems(axisTypeList)
+        self.axisType.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.axisType.currentIndexChanged.connect(self.onColorMapChanged)
+        self.rightLayout.addWidget(self.axisType)
+
         # Add Visualize button
         visualizeButton = QPushButton("Visualize Spectrogram")
         visualizeButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
         visualizeButton.clicked.connect(self.plotSpectrogram)
         self.rightLayout.addWidget(visualizeButton)
+
+        # Add Save image button
+        saveButton = QPushButton("Save Image")
+        saveButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        saveButton.clicked.connect(self.onSaveButtonClicked)
+        self.rightLayout.addWidget(saveButton)
 
         #return rightPanel
         return rightPanel
@@ -216,9 +236,10 @@ class SpectrogramPage(QWidget):
         n_fft = int(self.windowSize.currentText())
         hop_length = self.hopLength.value()
         color_map = self.colorMap.currentText()
+        axis_type = self.axisType.currentText()
 
         # create spectrogram plot
-        plotter = SpectrogramPlot(signal, sr, axis_type="log", title="Spectrogram", xlabel="Time", ylabel="Frequency")
+        plotter = SpectrogramPlot(signal, sr, axis_type=axis_type, title="Spectrogram", xlabel="Time", ylabel="Frequency")
         plotter.compute_spectrogram(n_fft=n_fft, hop_length=hop_length)
         
         # clear previous plot
@@ -234,7 +255,7 @@ class SpectrogramPage(QWidget):
         for spine in ax.spines.values():
             spine.set_visible(False)
 
-        img = librosa.display.specshow(plotter.data, sr=sr, x_axis='time', y_axis='log', ax=ax, cmap=color_map,hop_length=hop_length)
+        img = librosa.display.specshow(plotter.data, sr=sr, x_axis='time', y_axis=axis_type, ax=ax, cmap=color_map,hop_length=hop_length)
         colorbar = fig.colorbar(img, ax=ax, format='%+2.0f dB')
         colorbar.set_label('Amplitude (dB)', color='#b0bec5')
         colorbar.ax.yaxis.set_tick_params(color='#b0bec5')
@@ -267,8 +288,20 @@ class SpectrogramPage(QWidget):
             print(f"Error visualizing spectrogram: {e}")
 
     def onSaveButtonClicked(self):
-        # Placeholder for save button logic
-        pass
+        if not hasattr(self, 'spectrogramCanvas') or self.spectrogramCanvas is None:
+            print("No spectrogram to save.")
+            return
+        
+        options = QFileDialog.Options()
+        default_name = f"spectrogram_{QDateTime.currentDateTime().toString('yyyyMMdd_hhmmss')}.png"
+        fileName, _ = QFileDialog.getSaveFileName(self, "Save Image", default_name, "PNG Files (*.png);;JPEG Files (*.jpg);;SVG Files (*.svg);;PDF Files (*.pdf);;All Files (*)"
+, options=options)
+        if fileName:
+            try:
+                self.spectrogramCanvas.figure.savefig(fileName, dpi=300, bbox_inches='tight')
+                QMessageBox.information(self, "Success", f"Image saved as {fileName}")
+            except Exception as e:
+                QMessageBox.warning (self, "Error", f"Failed to save image: {e}")
 
 
 
