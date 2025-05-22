@@ -7,6 +7,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import librosa.display
+import vlc
 
 class SpectrogramPage(QWidget):
     def __init__(self):
@@ -32,6 +33,9 @@ class SpectrogramPage(QWidget):
         self.canvas.setContentsMargins(0, 0, 0, 0)
         self.canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.canvas.hide()
+
+        # play audio
+        self.player = vlc.MediaPlayer()
 
         self.buildUI()
 
@@ -75,7 +79,7 @@ class SpectrogramPage(QWidget):
         self.inputToggle.currentIndexChanged.connect(self.onInputSourceChanged)
         self.rightLayout.addWidget(self.inputToggle)
         
-    # AUDIO FILE CONTAINER
+        # AUDIO FILE CONTAINER
         self.audioFileContainer = QWidget()
         audioFileLayout = QVBoxLayout()
         audioFileLayout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
@@ -84,6 +88,7 @@ class SpectrogramPage(QWidget):
         openButton = QPushButton("Open Audio File")
         openButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
         openButton.clicked.connect(self.openFileDialog)
+        openButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         # Add file label
         self.fileLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
@@ -108,6 +113,12 @@ class SpectrogramPage(QWidget):
         rightPanel.setStyleSheet("background-color: #000033;")
         rightPanel.setLayout(self.rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+
+        # Add play audio button
+        playButton = QPushButton("Play Audio")
+        playButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        playButton.clicked.connect(self.onPlayButtonClicked)
+        self.rightLayout.addWidget(playButton)
 
         # Window size label
         windowSizeLabel = QLabel("Window Size")
@@ -286,7 +297,7 @@ class SpectrogramPage(QWidget):
             self.plotSpectrogram()
         except Exception as e:
             print(f"Error visualizing spectrogram: {e}")
-
+        
     def onSaveButtonClicked(self):
         if not hasattr(self, 'spectrogramCanvas') or self.spectrogramCanvas is None:
             print("No spectrogram to save.")
@@ -303,6 +314,15 @@ class SpectrogramPage(QWidget):
             except Exception as e:
                 QMessageBox.warning (self, "Error", f"Failed to save image: {e}")
 
+    def onPlayButtonClicked(self):
+        if not self.audioPath:
+            QMessageBox.warning(self, "Error", "No audio file selected.")
+            return
+
+        # play audio
+        self.player.set_media(vlc.Media(self.audioPath))
+        self.player.audio_set_volume(50)
+        self.player.play()
 
 
 
