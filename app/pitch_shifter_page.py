@@ -21,11 +21,11 @@ class PitchShifterPage(QWidget):
         # label logic
         spectrographLabel = QLabel("Spectrograph Widget")
         spectrographLabel.setFont(QFont("Arial", 20))
-        spectrographLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
+        spectrographLabel.setStyleSheet("color: #e6e6f0; font-weight: bold;")
         spectrographLayout.addWidget(spectrographLabel)
 
         # set layout
-        spectrographWidget.setStyleSheet("background-color: #000033;")
+        spectrographWidget.setStyleSheet("background-color: #12121c;")
         spectrographLayout.setAlignment(Qt.AlignLeft)
         spectrographWidget.setLayout(spectrographLayout)
         spectrographWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -40,13 +40,13 @@ class PitchShifterPage(QWidget):
         # Section Title
         rightLabel = QLabel("Control Panel")
         rightLabel.setFont(QFont("Arial", 20))
-        rightLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
+        rightLabel.setStyleSheet("color: #e6e6f0; font-weight: bold;")
         rightLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         self.rightLayout.addWidget(rightLabel)
 
         # Input source toggle
         self.inputToggle.addItems(["Audio File", "Microphone"])
-        self.inputToggle.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.inputToggle.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.inputToggle.currentIndexChanged.connect(self.onInputSourceChanged)
         self.rightLayout.addWidget(self.inputToggle)
         
@@ -57,11 +57,11 @@ class PitchShifterPage(QWidget):
 
         # Add button to open file dialog
         openButton = QPushButton("Open Audio File")
-        openButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        openButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         openButton.clicked.connect(self.openFileDialog)
 
         # Add file label
-        self.fileLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.fileLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.fileLabel.setAlignment(Qt.AlignHCenter)
         audioFileLayout.addWidget(openButton)
         audioFileLayout.addWidget(self.fileLabel)
@@ -72,7 +72,7 @@ class PitchShifterPage(QWidget):
         self.micContainer = QWidget()
         micLayout = QVBoxLayout()
         micLabel = QLabel("Microphone Input")
-        micLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        micLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         micLayout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         micLayout.addWidget(micLabel)
         self.micContainer.setLayout(micLayout)
@@ -80,7 +80,7 @@ class PitchShifterPage(QWidget):
         self.rightLayout.addWidget(self.micContainer)
 
         # set layout
-        rightPanel.setStyleSheet("background-color: #000033;")
+        rightPanel.setStyleSheet("background-color: #242436;")
         rightPanel.setLayout(self.rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 

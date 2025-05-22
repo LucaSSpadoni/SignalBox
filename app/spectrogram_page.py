@@ -7,7 +7,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import librosa.display
-import vlc
+import vlc # type: ignore
 
 class SpectrogramPage(QWidget):
     def __init__(self):
@@ -46,13 +46,12 @@ class SpectrogramPage(QWidget):
 
         spectrogramLayout.setContentsMargins(0, 0, 0, 0)
         spectrogramLayout.setSpacing(0)
-        self.spectrogramWidget.setStyleSheet("background-color: #000033;")
+        self.spectrogramWidget.setStyleSheet("background-color: #12121c;")
 
         # Add canvas to the layout
         spectrogramLayout.addWidget(self.canvas)
 
         # set layout
-        self.spectrogramWidget.setStyleSheet("background-color: #000033;")
         spectrogramLayout.setAlignment(Qt.AlignLeft)
         self.spectrogramWidget.setLayout(spectrogramLayout)
         self.spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -69,13 +68,13 @@ class SpectrogramPage(QWidget):
         # Section Title
         rightLabel = QLabel("Control Panel")
         rightLabel.setFont(QFont("Arial", 20))
-        rightLabel.setStyleSheet("color: #b0bec5; font-weight: bold;")
+        rightLabel.setStyleSheet("color: #e6e6f0; font-weight: bold;")
         rightLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         self.rightLayout.addWidget(rightLabel)
 
         # Input source toggle
         self.inputToggle.addItems(["Audio File", "Microphone"])
-        self.inputToggle.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.inputToggle.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.inputToggle.currentIndexChanged.connect(self.onInputSourceChanged)
         self.rightLayout.addWidget(self.inputToggle)
         
@@ -86,12 +85,12 @@ class SpectrogramPage(QWidget):
 
         # Add button to open file dialog
         openButton = QPushButton("Open Audio File")
-        openButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        openButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         openButton.clicked.connect(self.openFileDialog)
         openButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         # Add file label
-        self.fileLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.fileLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.fileLabel.setAlignment(Qt.AlignHCenter)
         audioFileLayout.addWidget(openButton)
         audioFileLayout.addWidget(self.fileLabel)
@@ -102,7 +101,7 @@ class SpectrogramPage(QWidget):
         self.micContainer = QWidget()
         micLayout = QVBoxLayout()
         micLabel = QLabel("Microphone Input")
-        micLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        micLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         micLayout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         micLayout.addWidget(micLabel)
         self.micContainer.setLayout(micLayout)
@@ -110,30 +109,30 @@ class SpectrogramPage(QWidget):
         self.rightLayout.addWidget(self.micContainer)
 
         # set layout
-        rightPanel.setStyleSheet("background-color: #000033;")
+        rightPanel.setStyleSheet("background-color: #242436;")
         rightPanel.setLayout(self.rightLayout)
         rightPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
         # Add play audio button
         playButton = QPushButton("Play Audio")
-        playButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        playButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         playButton.clicked.connect(self.onPlayButtonClicked)
         self.rightLayout.addWidget(playButton)
 
         # Window size label
         windowSizeLabel = QLabel("Window Size")
-        windowSizeLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        windowSizeLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         windowSizeLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         self.rightLayout.addWidget(windowSizeLabel)
 
         # Add window size dropdown
         self.windowSize.addItems(["256", "512", "1024", "2048"])
-        self.windowSize.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.windowSize.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.windowSize.currentIndexChanged.connect(self.onWindowSizeChanged)
         self.rightLayout.addWidget(self.windowSize)
 
         # Hop length label
-        self.hopLengthValue.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.hopLengthValue.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.hopLengthValue.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         self.rightLayout.addWidget(self.hopLengthValue)
 
@@ -141,26 +140,26 @@ class SpectrogramPage(QWidget):
         self.hopLength.setMinimum(1)
         self.hopLength.setMaximum(512)
         self.hopLength.setValue(1)
-        self.hopLength.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.hopLength.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.hopLength.valueChanged.connect(self.onHopLengthChanged)
         self.rightLayout.addWidget(self.hopLength)
 
         # Color map label
         colorMapLabel = QLabel("Color Map")
-        colorMapLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        colorMapLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         colorMapLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         self.rightLayout.addWidget(colorMapLabel)
 
         # Add color map dropdown
         colorMapList = ["viridis", "plasma", "inferno", "magma", "cividis", "turbo"]
         self.colorMap.addItems(colorMapList)
-        self.colorMap.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.colorMap.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.colorMap.currentIndexChanged.connect(self.onColorMapChanged)
         self.rightLayout.addWidget(self.colorMap)
 
         # Add Axis Type label
         axisTypeLabel = QLabel("Axis Type")
-        axisTypeLabel.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        axisTypeLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         axisTypeLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         self.rightLayout.addWidget(axisTypeLabel)
 
@@ -168,23 +167,23 @@ class SpectrogramPage(QWidget):
         axisTypeList = ["linear", "log"]
         self.axisType = QComboBox()
         self.axisType.addItems(axisTypeList)
-        self.axisType.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        self.axisType.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.axisType.currentIndexChanged.connect(self.onColorMapChanged)
         self.rightLayout.addWidget(self.axisType)
 
         # Add Visualize button
         visualizeButton = QPushButton("Visualize Spectrogram")
-        visualizeButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
-        visualizeButton.clicked.connect(self.plotSpectrogram)
+        visualizeButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
+        visualizeButton.clicked.connect(self.onVisualizeButtonClicked)
         self.rightLayout.addWidget(visualizeButton)
 
         # Add Save image button
         saveButton = QPushButton("Save Image")
-        saveButton.setStyleSheet("font-size: 10px; color: #b0bec5; font-weight: bold;")
+        saveButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         saveButton.clicked.connect(self.onSaveButtonClicked)
         self.rightLayout.addWidget(saveButton)
 
-        #return rightPanel
+        # return rightPanel
         return rightPanel
 
     def buildUI(self):
@@ -254,33 +253,32 @@ class SpectrogramPage(QWidget):
         plotter.compute_spectrogram(n_fft=n_fft, hop_length=hop_length)
         
         # clear previous plot
-        #self.canvas.figure.clf()
-        fig = Figure(figsize=(5,4),dpi=100,facecolor='#000033')
+        fig = Figure(figsize=(5,4),dpi=100,facecolor='#12121c')
         canvas = FigureCanvas(fig)
         canvas.setStyleSheet("background-color: transparent;")
         canvas.setContentsMargins(0, 0, 0, 0)
         canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         ax = fig.add_subplot(111)
 
-        ax.set_facecolor('#000033')
+        ax.set_facecolor('#12121c')
         for spine in ax.spines.values():
             spine.set_visible(False)
 
         img = librosa.display.specshow(plotter.data, sr=sr, x_axis='time', y_axis=axis_type, ax=ax, cmap=color_map,hop_length=hop_length)
         colorbar = fig.colorbar(img, ax=ax, format='%+2.0f dB')
-        colorbar.set_label('Amplitude (dB)', color='#b0bec5')
-        colorbar.ax.yaxis.set_tick_params(color='#b0bec5')
-        colorbar.outline.set_edgecolor('#b0bec5')
-        plt.setp(colorbar.ax.get_yticklabels(), color='#b0bec5')
+        colorbar.set_label('Amplitude (dB)', color='#e6e6f0')
+        colorbar.ax.yaxis.set_tick_params(color='#e6e6f0')
+        colorbar.outline.set_edgecolor('#e6e6f0')
+        plt.setp(colorbar.ax.get_yticklabels(), color='#e6e6f0')
 
         # Style the plot
-        ax.tick_params(colors='#b0bec5')  # axis ticks
-        ax.spines['bottom'].set_color('#b0bec5')
-        ax.spines['left'].set_color('#b0bec5')
-        ax.xaxis.label.set_color('#b0bec5')
-        ax.yaxis.label.set_color('#b0bec5')
+        ax.tick_params(colors='#e6e6f0')  # axis ticks
+        ax.spines['bottom'].set_color('#e6e6f0')
+        ax.spines['left'].set_color('#e6e6f0')
+        ax.xaxis.label.set_color('#e6e6f0')
+        ax.yaxis.label.set_color('#e6e6f0')
         for spine in ax.spines.values():
-            spine.set_edgecolor('#b0bec5')
+            spine.set_edgecolor('#e6e6f0')
 
         # Clear previous plot if any
         layout = self.spectrogramWidget.layout()

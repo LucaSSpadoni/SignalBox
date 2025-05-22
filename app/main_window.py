@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QSizePolicy
 from app.spectrogram_page import SpectrogramPage
 from app.equalizer_page import EqualizerPage
 from app.pitch_shifter_page import PitchShifterPage
+from app.real_time_visualizer_page import RealTimePage
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -15,7 +16,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Main Window")
         self.setGeometry(200, 200, 800, 500)
         self.center()
-        self.setStyleSheet("background-color: #71797E;")
+        self.setStyleSheet("background-color: #1b1b2f;")
         self.stack = self.createStack()
         self.setCentralWidget(self.buildUI())
 
@@ -38,6 +39,7 @@ class MainWindow(QMainWindow):
     def createStack(self):
         stack = QStackedWidget()
         stack.addWidget(SpectrogramPage())
+        stack.addWidget(RealTimePage())
         stack.addWidget(EqualizerPage())
         stack.addWidget(PitchShifterPage())
         return stack
@@ -47,14 +49,14 @@ class MainWindow(QMainWindow):
         navBar = QWidget()
         navLayout = QHBoxLayout()
 
-        navBar.setStyleSheet("background-color: #000033;")
+        navBar.setStyleSheet("background-color:	#242436;")
         navBar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
         navLayout.addWidget(self.titleLabel("SignalBox"), alignment=Qt.AlignLeft)
 
-        for i, page in enumerate(["Spectrogram Visualizer", "Equalizer", "Pitch Shifter"]):
+        for i, page in enumerate(["Static Visualizer", "Real-time Visualizer", "Equalizer", "Pitch Shifter"]):
             button = QPushButton(page)
-            button.setStyleSheet("color: #b0bec5; font-weight: bold;")
+            button.setStyleSheet("color: #e6e6f0; font-weight: bold;")
             button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             button.clicked.connect(lambda _, x=i: self.stack.setCurrentIndex(x))
             navLayout.addWidget(button)
