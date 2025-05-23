@@ -1,4 +1,9 @@
-grey - #71797E
-purple - #8e44ad
-light blue - #b0bec5
-Dark purple - #000033
+Spectrogram BG - #12121c
+Text Color - #e6e6f0
+Secondary Text color - #a0a0b8
+Border color - #38384a
+Primary Accent - #8e44ad
+Widget BG - #242436
+Background - #1b1b2f
+Accent Hover - #a65fc4
+

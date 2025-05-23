@@ -1,0 +1,20 @@
+No Order
+
+1. Improve Control panel look
+    a. fix button look
+    b. change slider color to primary Accent
+    c. add a hover Accent
+
+2. Start buidling equalizer logic/control panel
+
+3. Start building Pitch shifter logic/control panel
+
+4. build spectrograph logic
+
+5. Add microphone capability
+
+6. Add save audio capability
+
+7. Add real time processing
+
+8. Finish real time processing page
