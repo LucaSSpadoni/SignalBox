@@ -100,10 +100,35 @@ class SpectrogramPage(QWidget):
         # MIC CONTAINER
         self.micContainer = QWidget()
         micLayout = QVBoxLayout()
+
+        # mic label
         micLabel = QLabel("Microphone Input")
         micLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         micLayout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         micLayout.addWidget(micLabel)
+
+        # start/stop container
+        start_stopContainer = QWidget()
+        start_stopContainerLayout = QHBoxLayout()
+        start_stopContainerLayout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        start_stopContainer.setLayout(start_stopContainerLayout)
+        micLayout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+
+        # start button
+        startButton = QPushButton("Start Recording")
+        startButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
+        startButton.clicked.connect(self.micRecorder)
+        startButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+
+        # stop button
+        stopButton = QPushButton("Stop Recording")
+        stopButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
+        stopButton.clicked.connect(self.micRecorder)
+        stopButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        
+        start_stopContainerLayout.addWidget(startButton)
+        start_stopContainerLayout.addWidget(stopButton)
+        micLayout.addWidget(start_stopContainer)
         self.micContainer.setLayout(micLayout)
         self.micContainer.hide()
         self.rightLayout.addWidget(self.micContainer)
@@ -140,7 +165,6 @@ class SpectrogramPage(QWidget):
         self.hopLength.setMinimum(1)
         self.hopLength.setMaximum(512)
         self.hopLength.setValue(1)
-        self.hopLength.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         self.hopLength.valueChanged.connect(self.onHopLengthChanged)
         self.rightLayout.addWidget(self.hopLength)
 
