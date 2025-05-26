@@ -18,3 +18,5 @@ No Order
 7. Add real time processing
 
 8. Finish real time processing page
+
+9. Add a show analytics feature
