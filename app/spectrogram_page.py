@@ -102,14 +102,15 @@ class SpectrogramPage(QWidget):
         micLayout = QVBoxLayout()
 
         # mic label
-        micLabel = QLabel("Microphone Input")
+        micLabel = QLabel("Time elapsed: 00:00")
         micLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        micLayout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        micLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        micLabel.setAlignment(Qt.AlignHCenter)
         micLayout.addWidget(micLabel)
 
-        # start/stop container
+        # start/stop container 
         start_stopContainer = QWidget()
-        start_stopContainerLayout = QHBoxLayout()
+        start_stopContainerLayout = QVBoxLayout()
         start_stopContainerLayout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         start_stopContainer.setLayout(start_stopContainerLayout)
         micLayout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
@@ -126,6 +127,7 @@ class SpectrogramPage(QWidget):
         stopButton.clicked.connect(self.micRecorder)
         stopButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         
+        start_stopContainerLayout.setSpacing(15)
         start_stopContainerLayout.addWidget(startButton)
         start_stopContainerLayout.addWidget(stopButton)
         micLayout.addWidget(start_stopContainer)
@@ -207,6 +209,13 @@ class SpectrogramPage(QWidget):
         saveButton.clicked.connect(self.onSaveButtonClicked)
         self.rightLayout.addWidget(saveButton)
 
+        # Add save audio button
+        self.saveAudioButton = QPushButton("Save Audio")
+        self.saveAudioButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
+        self.saveAudioButton.clicked.connect(self.onSaveAudioButtonClicked)
+        self.rightLayout.addWidget(self.saveAudioButton)
+        self.saveAudioButton.hide()
+
         # return rightPanel
         return rightPanel
 
@@ -234,9 +243,11 @@ class SpectrogramPage(QWidget):
         if self.inputToggle.currentText() == "Audio File":
             self.audioFileContainer.show()
             self.micContainer.hide()
+            self.saveAudioButton.hide()
         else:
             self.audioFileContainer.hide()
             self.micContainer.show()
+            self.saveAudioButton.show()
 
     def micRecorder(self):
         # Placeholder for microphone input logic
@@ -257,7 +268,8 @@ class SpectrogramPage(QWidget):
     def plotSpectrogram(self):
 
         if not self.audioPath:
-            raise ValueError("No audio file selected.")
+            QMessageBox.warning(self, "Error", "No audio file selected.")
+            return
         
         # load audio file
         processor = AudioProcessor(self.audioPath)
@@ -322,7 +334,7 @@ class SpectrogramPage(QWidget):
         
     def onSaveButtonClicked(self):
         if not hasattr(self, 'spectrogramCanvas') or self.spectrogramCanvas is None:
-            print("No spectrogram to save.")
+            QMessageBox.warning(self, "Error", "No spectrogram to save. Please visualize first.")
             return
         
         options = QFileDialog.Options()
@@ -346,6 +358,8 @@ class SpectrogramPage(QWidget):
         self.player.audio_set_volume(50)
         self.player.play()
 
+    def onSaveAudioButtonClicked(self):
+        pass
 
 
 
