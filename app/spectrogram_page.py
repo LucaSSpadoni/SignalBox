@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSizePolicy, QFileDialog, QPushButton, QComboBox, QSlider, QMessageBox
 from PySide6.QtGui import QFont
-from PySide6.QtCore import Qt, QDateTime
+from PySide6.QtCore import Qt, QDateTime, QTimer, QElapsedTimer
 from app.audio_processor import AudioProcessor
 from app.spectrogram_plot import SpectrogramPlot
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -36,6 +36,12 @@ class SpectrogramPage(QWidget):
 
         # play audio
         self.player = vlc.MediaPlayer()
+
+        # create mic recorder
+        self.audioTimer = QTimer()
+        self.elapsedTimer = QElapsedTimer()
+        self.audioTimer.timeout.connect(self.updateElapsedTime)
+        self.audioTimer.setInterval(1000) # 1 second interval
 
         self.buildUI()
 
@@ -102,11 +108,11 @@ class SpectrogramPage(QWidget):
         micLayout = QVBoxLayout()
 
         # mic label
-        micLabel = QLabel("Time elapsed: 00:00")
-        micLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        micLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        micLabel.setAlignment(Qt.AlignHCenter)
-        micLayout.addWidget(micLabel)
+        self.micLabel = QLabel("Time elapsed: 00:00")
+        self.micLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
+        self.micLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.micLabel.setAlignment(Qt.AlignHCenter)
+        micLayout.addWidget(self.micLabel)
 
         # start/stop container 
         start_stopContainer = QWidget()
@@ -118,18 +124,25 @@ class SpectrogramPage(QWidget):
         # start button
         startButton = QPushButton("Start Recording")
         startButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        startButton.clicked.connect(self.micRecorder)
+        startButton.clicked.connect(self.onStartRecording)
         startButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         # stop button
         stopButton = QPushButton("Stop Recording")
         stopButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        stopButton.clicked.connect(self.micRecorder)
+        stopButton.clicked.connect(self.onStopRecording)
         stopButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         
+        # add reset button
+        resetButton = QPushButton("Reset Recording")
+        resetButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
+        resetButton.clicked.connect(self.onResetRecording)
+        resetButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+
         start_stopContainerLayout.setSpacing(15)
         start_stopContainerLayout.addWidget(startButton)
         start_stopContainerLayout.addWidget(stopButton)
+        start_stopContainerLayout.addWidget(resetButton)
         micLayout.addWidget(start_stopContainer)
         self.micContainer.setLayout(micLayout)
         self.micContainer.hide()
@@ -360,11 +373,24 @@ class SpectrogramPage(QWidget):
 
     def onSaveAudioButtonClicked(self):
         pass
+    
+    def onStartRecording(self):
+        self.elapsedTimer.start()
+        self.audioTimer.start()
 
+    def updateElapsedTime(self):
+        elapsed_ms = self.elapsedTimer.elapsed()
+        minutes = (elapsed_ms // 60000)
+        seconds = (elapsed_ms // 1000) % 60
+        self.micLabel.setText(f"Time elapsed: {minutes:02}:{seconds:02}")   
 
+    def onStopRecording(self):
+        self.audioTimer.stop()
 
-
-
+    def onResetRecording(self):
+        self.elapsedTimer.invalidate()
+        self.micLabel.setText("Time elapsed: 00:00")
+        self.audioTimer.stop()
 
 
         
