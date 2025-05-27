@@ -7,6 +7,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import librosa.display
+
 import vlc # type: ignore
 
 class SpectrogramPage(QWidget):
@@ -37,12 +38,13 @@ class SpectrogramPage(QWidget):
         # play audio
         self.player = vlc.MediaPlayer()
 
-        # create mic recorder
+        # create mic timer
         self.audioTimer = QTimer()
         self.elapsedTimer = QElapsedTimer()
         self.audioTimer.timeout.connect(self.updateElapsedTime)
         self.audioTimer.setInterval(1000) # 1 second interval
 
+        # build out the UI
         self.buildUI()
 
     def createSpectrogramWidget(self):
@@ -138,7 +140,8 @@ class SpectrogramPage(QWidget):
         resetButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         resetButton.clicked.connect(self.onResetRecording)
         resetButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-
+        
+        # add buttons to container
         start_stopContainerLayout.setSpacing(15)
         start_stopContainerLayout.addWidget(startButton)
         start_stopContainerLayout.addWidget(stopButton)
@@ -377,6 +380,7 @@ class SpectrogramPage(QWidget):
     def onStartRecording(self):
         self.elapsedTimer.start()
         self.audioTimer.start()
+        self.isRecording = True
 
     def updateElapsedTime(self):
         elapsed_ms = self.elapsedTimer.elapsed()
@@ -391,7 +395,6 @@ class SpectrogramPage(QWidget):
         self.elapsedTimer.invalidate()
         self.micLabel.setText("Time elapsed: 00:00")
         self.audioTimer.stop()
-
 
         
 

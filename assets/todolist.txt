@@ -1,5 +1,9 @@
 No Order
 
+/// see if you can use pyaudio instead of librosa for 
+/// audio prcoessing and then switch matplotlib for better 
+/// real time graphing library
+
 1. Improve Control panel look
     a. fix button look
     b. change slider color to primary Accent
