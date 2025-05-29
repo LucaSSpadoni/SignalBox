@@ -3,10 +3,12 @@ from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt, QDateTime, QTimer, QElapsedTimer
 from app.audio_processor import AudioProcessor
 from app.spectrogram_plot import SpectrogramPlot
+from app.audio_recorder import AudioRecorder
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import librosa.display
+import pyaudio # type: ignore
 
 import vlc # type: ignore
 
@@ -43,6 +45,10 @@ class SpectrogramPage(QWidget):
         self.elapsedTimer = QElapsedTimer()
         self.audioTimer.timeout.connect(self.updateElapsedTime)
         self.audioTimer.setInterval(1000) # 1 second interval
+
+        # create recording state
+        self.audioRecorder = AudioRecorder()
+        self.frames = None
 
         # build out the UI
         self.buildUI()
@@ -283,16 +289,32 @@ class SpectrogramPage(QWidget):
 
     def plotSpectrogram(self):
 
-        if not self.audioPath:
-            QMessageBox.warning(self, "Error", "No audio file selected.")
-            return
+        input_source = self.inputToggle.currentText()
         
-        # load audio file
-        processor = AudioProcessor(self.audioPath)
-        signal, sr = processor.load_audio()
+        # if the user wants to visualize the file input
+        if input_source == "Audio File":
+            if not self.audioPath:
+                QMessageBox.warning(self, "Error", "No audio file selected.")
+                return
+            
+            # load audio file
+            processor = AudioProcessor(self.audioPath)
+            signal, sr = processor.load_audio()
 
-        # create normalized audio
-        signal = processor.normalize_audio()
+            # create normalized audio
+            signal = processor.normalize_audio()
+        
+        # if the user wants to visualize the mic input
+        elif input_source == "Microphone":
+            if not self.frames:
+                QMessageBox.warning(self, "Error", "No audio recorded from microphone.")
+                return
+            
+            processor = AudioProcessor()
+            signal = processor.frames_to_array(self.frames)
+            processor.signal = signal
+            signal = processor.normalize_audio()
+            sr = self.audioRecorder.sampleRate # Assuming a default sample rate for mic input
 
         # get parameters
         n_fft = int(self.windowSize.currentText())
@@ -365,22 +387,59 @@ class SpectrogramPage(QWidget):
                 QMessageBox.warning (self, "Error", f"Failed to save image: {e}")
 
     def onPlayButtonClicked(self):
-        if not self.audioPath:
-            QMessageBox.warning(self, "Error", "No audio file selected.")
-            return
+        input_source = self.inputToggle.currentText()
 
-        # play audio
-        self.player.set_media(vlc.Media(self.audioPath))
-        self.player.audio_set_volume(50)
-        self.player.play()
+        if input_source == "Audio File":
+            if not self.audioPath:
+                QMessageBox.warning(self, "Error", "No audio file selected.")
+                return
+            
+            # play audio
+            self.player.set_media(vlc.Media(self.audioPath))
+            self.player.audio_set_volume(50)
+            self.player.play()
+
+        elif input_source == "Microphone":
+            if not self.frames:
+                QMessageBox.warning(self, "Error", "No audio recorded from microphone.")
+                return
+            
+            # use pyaudio to play recorded audio
+            p = pyaudio.PyAudio()
+
+            try:
+                stream = p.open(format=pyaudio.paInt16,
+                                channels=self.audioRecorder.channels,
+                                rate=self.audioRecorder.sampleRate,
+                                output=True)
+
+                # Convert frames to bytes and play
+                audio_data = b''.join(self.frames)
+                stream.write(audio_data)
+                stream.stop_stream()
+                stream.close()
+            finally:
+                p.terminate()
 
     def onSaveAudioButtonClicked(self):
-        pass
-    
+        if not self.frames:
+            QMessageBox.warning(self, "Error", "No audio recorded from microphone.")
+            return
+        
+        options = QFileDialog.Options()
+        default_name = f"recording_{QDateTime.currentDateTime().toString('yyyyMMdd_hhmmss')}.wav"
+        fileName, _ = QFileDialog.getSaveFileName(self, "Save Audio", default_name, "WAV Files (*.wav);;All Files (*)", options=options)
+        if fileName:
+            try:
+                self.audioRecorder.save_recording(fileName)
+                QMessageBox.information(self, "Success", f"Audio saved as {fileName}")
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"Failed to save audio: {e}")
+
     def onStartRecording(self):
         self.elapsedTimer.start()
         self.audioTimer.start()
-        self.isRecording = True
+        self.audioRecorder.start_recording()
 
     def updateElapsedTime(self):
         elapsed_ms = self.elapsedTimer.elapsed()
@@ -390,14 +449,20 @@ class SpectrogramPage(QWidget):
 
     def onStopRecording(self):
         self.audioTimer.stop()
+        self.audioRecorder.stop_recording()
+        self.frames = self.audioRecorder.frames
+        if self.frames:
+            QMessageBox.information(self, "Recording", "Audio recording stopped successfully.")
+        else:
+            QMessageBox.warning(self, "Recording", "No audio recorded.")
+            self.frames = None
+            self.audioRecorder.reset()
 
     def onResetRecording(self):
         self.elapsedTimer.invalidate()
         self.micLabel.setText("Time elapsed: 00:00")
         self.audioTimer.stop()
-
-        
-
-
+        self.audioRecorder.reset()
+        self.frames = None
 
         

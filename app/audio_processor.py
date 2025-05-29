@@ -1,9 +1,10 @@
 import librosa
 import numpy as np
 import soundfile as sf
+import wave
 
 class AudioProcessor:
-    def __init__(self, audio_file):
+    def __init__(self, audio_file = None):
         self.audio_file = audio_file
         self.target_sample_rate = 44100
         self.signal = None
@@ -30,7 +31,9 @@ class AudioProcessor:
         self.normalized_audio = librosa.util.normalize(self.signal,norm=np.inf)
         return self.normalized_audio
 
-    def save_audio(self, output_file):
-        # Check if the normalized audio signal is available
-        # Save the normalized audio signal to a file
-        pass
+    def frames_to_array(self,frames):
+        data = b''.join(frames)
+        audio_data = np.frombuffer(data, dtype=np.int16).astype(np.float32) / 32768.0  # Convert to float32 and normalize
+        self.signal = audio_data
+        self.sample_rate = 44100
+        return audio_data

@@ -1,4 +1,4 @@
-import pyaudio
+import pyaudio # type: ignore
 import threading
 import wave
 
@@ -83,3 +83,14 @@ class AudioRecorder:
             self.thread = None
         self.audioInterface.terminate()
         self.audioInterface = pyaudio.PyAudio()
+    
+    def terminate(self):
+        # Terminate the audio interface
+        self.audioInterface.terminate()
+
+    def get_frames(self):
+        # Retrieve the recorded audio data
+        if not self.frames:
+            print("No audio frames recorded.")
+            return None
+        return self.frames
