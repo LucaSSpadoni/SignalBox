@@ -12,7 +12,7 @@ import pyaudio # type: ignore
 
 import vlc # type: ignore
 
-class SpectrogramPage(QWidget):
+class PitchContourPage(QWidget):
     def __init__(self):
         super().__init__()
         self.setStyleSheet("background-color: #000033;")
@@ -283,104 +283,11 @@ class SpectrogramPage(QWidget):
         # Placeholder for color map logic
         pass
 
-    def plotSpectrogram(self):
-
-        input_source = self.inputToggle.currentText()
-        
-        # if the user wants to visualize the file input
-        if input_source == "Audio File":
-            if not self.audioPath:
-                QMessageBox.warning(self, "Error", "No audio file selected.")
-                return
-            
-            # load audio file
-            processor = AudioProcessor(self.audioPath)
-            signal, sr = processor.load_audio()
-
-            # create normalized audio
-            signal = processor.normalize_audio()
-        
-        # if the user wants to visualize the mic input
-        elif input_source == "Microphone":
-            if not self.frames:
-                QMessageBox.warning(self, "Error", "No audio recorded from microphone.")
-                return
-            
-            processor = AudioProcessor()
-            signal = processor.frames_to_array(self.frames)
-            processor.signal = signal
-            signal = processor.normalize_audio()
-            sr = self.audioRecorder.sampleRate # Assuming a default sample rate for mic input
-
-        # get parameters
-        n_fft = int(self.windowSize.currentText())
-        hop_length = self.hopLength.value()
-        color_map = self.colorMap.currentText()
-        axis_type = self.axisType.currentText()
-
-        # create spectrogram plot
-        plotter = SpectrogramPlot(signal, sr, axis_type=axis_type, title="Spectrogram", xlabel="Time", ylabel="Frequency")
-        plotter.compute_spectrogram(n_fft=n_fft, hop_length=hop_length)
-        
-        # clear previous plot
-        fig = Figure(figsize=(5,4),dpi=100,facecolor='#12121c')
-        canvas = FigureCanvas(fig)
-        canvas.setStyleSheet("background-color: transparent;")
-        canvas.setContentsMargins(0, 0, 0, 0)
-        canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        ax = fig.add_subplot(111)
-
-        ax.set_facecolor('#12121c')
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-
-        img = librosa.display.specshow(plotter.data, sr=sr, x_axis='time', y_axis=axis_type, ax=ax, cmap=color_map,hop_length=hop_length)
-        colorbar = fig.colorbar(img, ax=ax, format='%+2.0f dB')
-        colorbar.set_label('Amplitude (dB)', color='#e6e6f0')
-        colorbar.ax.yaxis.set_tick_params(color='#e6e6f0')
-        colorbar.outline.set_edgecolor('#e6e6f0')
-        plt.setp(colorbar.ax.get_yticklabels(), color='#e6e6f0')
-
-        # Style the plot
-        ax.tick_params(colors='#e6e6f0')  # axis ticks
-        ax.spines['bottom'].set_color('#e6e6f0')
-        ax.spines['left'].set_color('#e6e6f0')
-        ax.xaxis.label.set_color('#e6e6f0')
-        ax.yaxis.label.set_color('#e6e6f0')
-        for spine in ax.spines.values():
-            spine.set_edgecolor('#e6e6f0')
-
-        # Clear previous plot if any
-        layout = self.spectrogramWidget.layout()
-        for i in reversed(range(layout.count())):
-            widget = layout.itemAt(i).widget()
-            if widget:
-                widget.setParent(None)
-
-        layout.addWidget(canvas)
-        self.spectrogramCanvas = canvas
-
     def onVisualizeButtonClicked(self):
-        try:
-            self.plotSpectrogram()
-        except Exception as e:
-            print(f"Error visualizing spectrogram: {e}")
+        pass
         
     def onSaveButtonClicked(self):
-        if not hasattr(self, 'spectrogramCanvas') or self.spectrogramCanvas is None:
-            QMessageBox.warning(self, "Error", "No spectrogram to save. Please visualize first.")
-            return
-        
-        options = QFileDialog.Options()
-        default_name = f"spectrogram_{QDateTime.currentDateTime().toString('yyyyMMdd_hhmmss')}.png"
-        fileName, _ = QFileDialog.getSaveFileName(self, "Save Image", default_name, "PNG Files (*.png);;JPEG Files (*.jpg);;SVG Files (*.svg);;PDF Files (*.pdf);;All Files (*)"
-, options=options)
-        if fileName:
-            try:
-                self.spectrogramCanvas.figure.savefig(fileName, dpi=300, bbox_inches='tight')
-                QMessageBox.information(self, "Success", f"Image saved as {fileName}")
-            except Exception as e:
-                QMessageBox.warning (self, "Error", f"Failed to save image: {e}")
+        pass
 
     def onPlayButtonClicked(self):
         input_source = self.inputToggle.currentText()
@@ -461,4 +368,79 @@ class SpectrogramPage(QWidget):
         self.audioRecorder.reset()
         self.frames = None
 
+    def plotContour(self):
+
+        input_source = self.inputToggle.currentText()
         
+        # if the user wants to visualize the file input
+        if input_source == "Audio File":
+            if not self.audioPath:
+                QMessageBox.warning(self, "Error", "No audio file selected.")
+                return
+            
+            # load audio file
+            processor = AudioProcessor(self.audioPath)
+            signal, sr = processor.load_audio()
+
+            # create normalized audio
+            signal = processor.normalize_audio()
+        
+        # if the user wants to visualize the mic input
+        elif input_source == "Microphone":
+            if not self.frames:
+                QMessageBox.warning(self, "Error", "No audio recorded from microphone.")
+                return
+            
+            processor = AudioProcessor()
+            signal = processor.frames_to_array(self.frames)
+            processor.signal = signal
+            signal = processor.normalize_audio()
+            sr = self.audioRecorder.sampleRate # Assuming a default sample rate for mic input
+
+        # get parameters
+        n_fft = int(self.windowSize.currentText())
+        hop_length = self.hopLength.value()
+        color_map = self.colorMap.currentText()
+        axis_type = self.axisType.currentText()
+
+        # create spectrogram plot
+        plotter = SpectrogramPlot(signal, sr, axis_type=axis_type, title="Spectrogram", xlabel="Time", ylabel="Frequency")
+        plotter.compute_spectrogram(n_fft=n_fft, hop_length=hop_length)
+        
+        # clear previous plot
+        fig = Figure(figsize=(5,4),dpi=100,facecolor='#12121c')
+        canvas = FigureCanvas(fig)
+        canvas.setStyleSheet("background-color: transparent;")
+        canvas.setContentsMargins(0, 0, 0, 0)
+        canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        ax = fig.add_subplot(111)
+
+        ax.set_facecolor('#12121c')
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+        img = librosa.display.specshow(plotter.data, sr=sr, x_axis='time', y_axis=axis_type, ax=ax, cmap=color_map,hop_length=hop_length)
+        colorbar = fig.colorbar(img, ax=ax, format='%+2.0f dB')
+        colorbar.set_label('Amplitude (dB)', color='#e6e6f0')
+        colorbar.ax.yaxis.set_tick_params(color='#e6e6f0')
+        colorbar.outline.set_edgecolor('#e6e6f0')
+        plt.setp(colorbar.ax.get_yticklabels(), color='#e6e6f0')
+
+        # Style the plot
+        ax.tick_params(colors='#e6e6f0')  # axis ticks
+        ax.spines['bottom'].set_color('#e6e6f0')
+        ax.spines['left'].set_color('#e6e6f0')
+        ax.xaxis.label.set_color('#e6e6f0')
+        ax.yaxis.label.set_color('#e6e6f0')
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#e6e6f0')
+
+        # Clear previous plot if any
+        layout = self.spectrogramWidget.layout()
+        for i in reversed(range(layout.count())):
+            widget = layout.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)
+
+        layout.addWidget(canvas)
+        self.spectrogramCanvas = canvas

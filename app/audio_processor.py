@@ -1,7 +1,5 @@
 import librosa
 import numpy as np
-import soundfile as sf
-import wave
 
 class AudioProcessor:
     def __init__(self, audio_file = None):
@@ -37,3 +35,13 @@ class AudioProcessor:
         self.signal = audio_data
         self.sample_rate = 44100
         return audio_data
+    
+    def comp_fund_freq(self):
+        # Check if the audio signal is loaded
+        if self.signal is None:
+            raise ValueError("Audio signal not loaded. Please load an audio file first.")
+        
+        # Compute the fundamental frequency
+        f0, voiced_flag, voiced_probs = librosa.pyin(self.signal,sr=self.sample_rate, fmin=librosa.note_to_hz('C2'), fmax=librosa.note_to_hz('C7'))
+        times = librosa.times_like(f0, sr=self.sample_rate)
+        return times, f0, voiced_flag, voiced_probs

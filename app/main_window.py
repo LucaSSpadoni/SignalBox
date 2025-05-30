@@ -4,9 +4,8 @@ from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import QSizePolicy
 from app.spectrogram_page import SpectrogramPage
-from app.equalizer_page import EqualizerPage
 from app.pitch_shifter_page import PitchShifterPage
-from app.real_time_visualizer_page import RealTimePage
+from app.pitch_contour import PitchContourPage
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -39,8 +38,7 @@ class MainWindow(QMainWindow):
     def createStack(self):
         stack = QStackedWidget()
         stack.addWidget(SpectrogramPage())
-        stack.addWidget(RealTimePage())
-        stack.addWidget(EqualizerPage())
+        stack.addWidget(PitchContourPage())
         stack.addWidget(PitchShifterPage())
         return stack
 
@@ -54,7 +52,7 @@ class MainWindow(QMainWindow):
 
         navLayout.addWidget(self.titleLabel("SignalBox"), alignment=Qt.AlignLeft)
 
-        for i, page in enumerate(["Static Visualizer", "Real-time Visualizer", "Equalizer", "Pitch Shifter"]):
+        for i, page in enumerate(["Static Visualizer", "Pitch Contour","Pitch Shifter"]):
             button = QPushButton(page)
             button.setStyleSheet("color: #e6e6f0; font-weight: bold;")
             button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
