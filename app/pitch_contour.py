@@ -2,12 +2,10 @@ from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSizePo
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt, QDateTime, QTimer, QElapsedTimer
 from app.audio_processor import AudioProcessor
-from app.spectrogram_plot import SpectrogramPlot
+from app.contour_plot import ContourPlot
 from app.audio_recorder import AudioRecorder
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-import librosa.display
 import pyaudio # type: ignore
 
 import vlc # type: ignore
@@ -53,25 +51,25 @@ class PitchContourPage(QWidget):
         # build out the UI
         self.buildUI()
 
-    def createSpectrogramWidget(self):
+    def createContourWidget(self):
         # Left side
-        self.spectrogramWidget = QWidget()
-        spectrogramLayout = QVBoxLayout()
+        self.contourWidget = QWidget()
+        contourLayout = QVBoxLayout()
 
-        spectrogramLayout.setContentsMargins(0, 0, 0, 0)
-        spectrogramLayout.setSpacing(0)
-        self.spectrogramWidget.setStyleSheet("background-color: #12121c;")
+        contourLayout.setContentsMargins(0, 0, 0, 0)
+        contourLayout.setSpacing(0)
+        self.contourWidget.setStyleSheet("background-color: #12121c;")
 
         # Add canvas to the layout
-        spectrogramLayout.addWidget(self.canvas)
+        contourLayout.addWidget(self.canvas)
 
         # set layout
-        spectrogramLayout.setAlignment(Qt.AlignLeft)
-        self.spectrogramWidget.setLayout(spectrogramLayout)
-        self.spectrogramWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        contourLayout.setAlignment(Qt.AlignLeft)
+        self.contourWidget.setLayout(contourLayout)
+        self.contourWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
-        # return spectrogramWidget
-        return self.spectrogramWidget
+        # return contourWidget
+        return self.contourWidget
 
     def createRightWidget(self):
         # Right side
@@ -168,59 +166,8 @@ class PitchContourPage(QWidget):
         playButton.clicked.connect(self.onPlayButtonClicked)
         self.rightLayout.addWidget(playButton)
 
-        # Window size label
-        windowSizeLabel = QLabel("Window Size")
-        windowSizeLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        windowSizeLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        self.rightLayout.addWidget(windowSizeLabel)
-
-        # Add window size dropdown
-        self.windowSize.addItems(["256", "512", "1024", "2048"])
-        self.windowSize.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        self.windowSize.currentIndexChanged.connect(self.onWindowSizeChanged)
-        self.rightLayout.addWidget(self.windowSize)
-
-        # Hop length label
-        self.hopLengthValue.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        self.hopLengthValue.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        self.rightLayout.addWidget(self.hopLengthValue)
-
-        # Add hop length slider
-        self.hopLength.setMinimum(1)
-        self.hopLength.setMaximum(512)
-        self.hopLength.setValue(1)
-        self.hopLength.valueChanged.connect(self.onHopLengthChanged)
-        self.rightLayout.addWidget(self.hopLength)
-
-        # Color map label
-        colorMapLabel = QLabel("Color Map")
-        colorMapLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        colorMapLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        self.rightLayout.addWidget(colorMapLabel)
-
-        # Add color map dropdown
-        colorMapList = ["viridis", "plasma", "inferno", "magma", "cividis", "turbo"]
-        self.colorMap.addItems(colorMapList)
-        self.colorMap.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        self.colorMap.currentIndexChanged.connect(self.onColorMapChanged)
-        self.rightLayout.addWidget(self.colorMap)
-
-        # Add Axis Type label
-        axisTypeLabel = QLabel("Axis Type")
-        axisTypeLabel.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        axisTypeLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
-        self.rightLayout.addWidget(axisTypeLabel)
-
-        # Add Axis Type dropdown
-        axisTypeList = ["log", "linear"]
-        self.axisType = QComboBox()
-        self.axisType.addItems(axisTypeList)
-        self.axisType.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
-        self.axisType.currentIndexChanged.connect(self.onColorMapChanged)
-        self.rightLayout.addWidget(self.axisType)
-
         # Add Visualize button
-        visualizeButton = QPushButton("Visualize Spectrogram")
+        visualizeButton = QPushButton("Visualize Contour")
         visualizeButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         visualizeButton.clicked.connect(self.onVisualizeButtonClicked)
         self.rightLayout.addWidget(visualizeButton)
@@ -243,11 +190,8 @@ class PitchContourPage(QWidget):
 
     def buildUI(self):
         # combine widgets into page layout
-        self.layout.addWidget(self.createSpectrogramWidget(),3)
+        self.layout.addWidget(self.createContourWidget(),3)
         self.layout.addWidget(self.createRightWidget(),1)
-
-        # Set initial visibility
-        self.onWindowSizeChanged(0)
 
     def openFileDialog(self):
         # Open file dialog to select audio file
@@ -271,23 +215,27 @@ class PitchContourPage(QWidget):
             self.micContainer.show()
             self.saveAudioButton.show()
 
-    def onWindowSizeChanged(self, index):
-        n_fft = int(self.windowSize.currentText())
-        self.hopLength.setMinimum(n_fft // 8)
-        self.hopLength.setMaximum(n_fft // 2)
-
-    def onHopLengthChanged(self, value):
-        self.hopLengthValue.setText(f"Hop Length: {value}")
-    
-    def onColorMapChanged(self, index):
-        # Placeholder for color map logic
-        pass
-
     def onVisualizeButtonClicked(self):
-        pass
+        try:
+            self.plotContour()
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to visualize contour: {e}")
+            self.canvas.hide()
         
     def onSaveButtonClicked(self):
-        pass
+        if not hasattr(self, 'contourCanvas') or self.contourCanvas is None:
+            QMessageBox.warning(self, "Error", "No contour to save.")
+            return
+        
+        options = QFileDialog.Options()
+        default_name = f"contour_plot_{QDateTime.currentDateTime().toString('yyyyMMdd_hhmmss')}.png"
+        fileName, _ = QFileDialog.getSaveFileName(self, "Save Contour Plot", default_name, "PNG Files (*.png);;JPEG Files (*.jpg);;SVG Files (*.svg);;PDF Files (*.pdf);;All Files (*)", options=options)
+        if fileName:
+            try:
+                self.contourCanvas.figure.savefig(fileName, format='png', dpi=300, bbox_inches='tight')
+                QMessageBox.information(self, "Success", f"Contour plot saved as {fileName}")
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"Failed to save contour plot: {e}")
 
     def onPlayButtonClicked(self):
         input_source = self.inputToggle.currentText()
@@ -381,9 +329,8 @@ class PitchContourPage(QWidget):
             # load audio file
             processor = AudioProcessor(self.audioPath)
             signal, sr = processor.load_audio()
-
-            # create normalized audio
-            signal = processor.normalize_audio()
+            times, f0, voiced_flag, voiced_probs = processor.comp_fund_freq()
+            
         
         # if the user wants to visualize the mic input
         elif input_source == "Microphone":
@@ -394,53 +341,19 @@ class PitchContourPage(QWidget):
             processor = AudioProcessor()
             signal = processor.frames_to_array(self.frames)
             processor.signal = signal
-            signal = processor.normalize_audio()
-            sr = self.audioRecorder.sampleRate # Assuming a default sample rate for mic input
+            processor.sample_rate = self.audioRecorder.sampleRate # Assuming a default sample rate for mic input
+            times, f0, voiced_flag, voiced_probs = processor.comp_fund_freq()
 
-        # get parameters
-        n_fft = int(self.windowSize.currentText())
-        hop_length = self.hopLength.value()
-        color_map = self.colorMap.currentText()
-        axis_type = self.axisType.currentText()
+        plotter = ContourPlot(times, f0, voiced_flag, voiced_probs)
+        canvas = plotter.plot_pitch()
 
-        # create spectrogram plot
-        plotter = SpectrogramPlot(signal, sr, axis_type=axis_type, title="Spectrogram", xlabel="Time", ylabel="Frequency")
-        plotter.compute_spectrogram(n_fft=n_fft, hop_length=hop_length)
-        
-        # clear previous plot
-        fig = Figure(figsize=(5,4),dpi=100,facecolor='#12121c')
-        canvas = FigureCanvas(fig)
-        canvas.setStyleSheet("background-color: transparent;")
-        canvas.setContentsMargins(0, 0, 0, 0)
-        canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        ax = fig.add_subplot(111)
-
-        ax.set_facecolor('#12121c')
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-
-        img = librosa.display.specshow(plotter.data, sr=sr, x_axis='time', y_axis=axis_type, ax=ax, cmap=color_map,hop_length=hop_length)
-        colorbar = fig.colorbar(img, ax=ax, format='%+2.0f dB')
-        colorbar.set_label('Amplitude (dB)', color='#e6e6f0')
-        colorbar.ax.yaxis.set_tick_params(color='#e6e6f0')
-        colorbar.outline.set_edgecolor('#e6e6f0')
-        plt.setp(colorbar.ax.get_yticklabels(), color='#e6e6f0')
-
-        # Style the plot
-        ax.tick_params(colors='#e6e6f0')  # axis ticks
-        ax.spines['bottom'].set_color('#e6e6f0')
-        ax.spines['left'].set_color('#e6e6f0')
-        ax.xaxis.label.set_color('#e6e6f0')
-        ax.yaxis.label.set_color('#e6e6f0')
-        for spine in ax.spines.values():
-            spine.set_edgecolor('#e6e6f0')
-
-        # Clear previous plot if any
-        layout = self.spectrogramWidget.layout()
+        layout = self.contourWidget.layout()
         for i in reversed(range(layout.count())):
-            widget = layout.itemAt(i).widget()
-            if widget:
-                widget.setParent(None)
+            item = layout.itemAt(i)
+            if item.widget():
+                item.widget().deleteLater()
 
         layout.addWidget(canvas)
-        self.spectrogramCanvas = canvas
+        self.contourCanvas = canvas
+
+        
