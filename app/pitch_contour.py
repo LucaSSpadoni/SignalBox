@@ -4,6 +4,7 @@ from PySide6.QtCore import Qt, QDateTime, QTimer, QElapsedTimer
 from app.audio_processor import AudioProcessor
 from app.contour_plot import ContourPlot
 from app.audio_recorder import AudioRecorder
+from app.anaylze_window import AnalyzeWindow
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import pyaudio # type: ignore
@@ -171,6 +172,12 @@ class PitchContourPage(QWidget):
         visualizeButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
         visualizeButton.clicked.connect(self.onVisualizeButtonClicked)
         self.rightLayout.addWidget(visualizeButton)
+
+        # add analysis button
+        analysisButton = QPushButton("Analyze")
+        analysisButton.setStyleSheet("font-size: 10px; color: #e6e6f0; font-weight: bold;")
+        analysisButton.clicked.connect(self.onAnalyzeClicked)
+        self.rightLayout.addWidget(analysisButton)
 
         # Add Save image button
         saveButton = QPushButton("Save Image")
@@ -356,4 +363,7 @@ class PitchContourPage(QWidget):
         layout.addWidget(canvas)
         self.contourCanvas = canvas
 
+    def onAnalyzeClicked(self):
+        self.analysis_window = AnalyzeWindow()
+        self.analysis_window.show()
         
