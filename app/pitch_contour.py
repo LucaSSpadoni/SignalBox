@@ -20,15 +20,13 @@ class PitchContourPage(QWidget):
 
         # control panel
         self.inputToggle = QComboBox()
-        self.windowSize = QComboBox()
-        self.hopLength = QSlider(Qt.Horizontal)
-        self.hopLengthValue = QLabel("Hop Length: 1")
-        self.colorMap = QComboBox()
         self.fileLabel = QLabel("File: None")
 
         # audio processor
         self.audioPath = None
-
+        self.signal = None
+        self.sampleRate = 44100 # default sample rate
+        
         # plotting
         self.canvas = FigureCanvas(Figure(figsize=(5, 4)))
         self.canvas.setStyleSheet("background-color: transparent;")
@@ -315,7 +313,7 @@ class PitchContourPage(QWidget):
             QMessageBox.warning(self, "Recording", "No audio recorded.")
             self.frames = None
             self.audioRecorder.reset()
-
+        
     def onResetRecording(self):
         self.elapsedTimer.invalidate()
         self.micLabel.setText("Time elapsed: 00:00")
@@ -335,7 +333,7 @@ class PitchContourPage(QWidget):
             
             # load audio file
             processor = AudioProcessor(self.audioPath)
-            signal, sr = processor.load_audio()
+            self.signal, self.sampleRate = processor.load_audio()
             times, f0, voiced_flag, voiced_probs = processor.comp_fund_freq()
             
         
@@ -346,9 +344,10 @@ class PitchContourPage(QWidget):
                 return
             
             processor = AudioProcessor()
-            signal = processor.frames_to_array(self.frames)
-            processor.signal = signal
-            processor.sample_rate = self.audioRecorder.sampleRate # Assuming a default sample rate for mic input
+            self.signal = processor.frames_to_array(self.frames)
+            processor.signal = self.signal
+            self.sampleRate = self.audioRecorder.sampleRate
+            processor.sample_rate = self.sampleRate
             times, f0, voiced_flag, voiced_probs = processor.comp_fund_freq()
 
         plotter = ContourPlot(times, f0, voiced_flag, voiced_probs)
@@ -364,6 +363,20 @@ class PitchContourPage(QWidget):
         self.contourCanvas = canvas
 
     def onAnalyzeClicked(self):
-        self.analysis_window = AnalyzeWindow()
+        if self.audioRecorder.is_recording:
+            QMessageBox.warning(self, "Error", "Please stop recording before analyzing.")
+            return
+        
+        if not self.audioPath and not self.frames:
+            # if no audio file is selected or recorded
+            QMessageBox.warning(self, "Error", "No audio file selected or recorded.")
+            return
+
+        if self.signal is None or self.sampleRate is None:
+            # if signal or sample rate is not set
+            QMessageBox.warning(self, "Error", "No audio signal available for analysis. Try visualizing first.")
+            return
+        
+        self.analysis_window = AnalyzeWindow(signal=self.signal,samplerate=self.sampleRate)
         self.analysis_window.show()
         

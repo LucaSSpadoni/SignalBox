@@ -3,11 +3,17 @@ from PySide6.QtWidgets import QMainWindow, QApplication
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QVBoxLayout
 from PySide6.QtGui import QFont
+import numpy as np
+import librosa
+from app.audio_processor import AudioProcessor
 
 
 class AnalyzeWindow(QWidget):
-    def __init__(self):
+    def __init__(self, signal=None,samplerate=None):
         super().__init__()
+        self.signal = signal
+        self.samplerate = samplerate
+        self.audioProcessor = AudioProcessor(signal = signal, sample_rate = samplerate)
 
         # Set window properties
         self.setWindowTitle("Analyze Window")
@@ -42,6 +48,47 @@ class AnalyzeWindow(QWidget):
         titleLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         statsLayout.addWidget(titleLabel)
 
+        # add time label
+        self.timeLabel = QLabel()
+        self.timeLabel.setText("Time: 00:00:00")
+        self.timeLabel.setFont(QFont("Arial", 14))
+        self.timeLabel.setStyleSheet("color: #e6e6f0;")
+        self.timeLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        statsLayout.addWidget(self.timeLabel)
+
+        # add average energy label
+        self.energyLabel = QLabel()
+        self.energyLabel.setText("Average Energy: 0.0 dB")
+        self.energyLabel.setFont(QFont("Arial", 14))
+        self.energyLabel.setStyleSheet("color: #e6e6f0;")
+        self.energyLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        statsLayout.addWidget(self.energyLabel)
+
+        # add zero crossing rate label
+        self.zcrLabel = QLabel()
+        self.zcrLabel.setText("Zero Crossing Rate: 0.0")
+        self.zcrLabel.setFont(QFont("Arial", 14))
+        self.zcrLabel.setStyleSheet("color: #e6e6f0;")
+        self.zcrLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        statsLayout.addWidget(self.zcrLabel)
+
+        # add silence percentage label
+        self.silenceLabel = QLabel()
+        self.silenceLabel.setText("Silence Percentage: 0.0%")
+        self.silenceLabel.setFont(QFont("Arial", 14))
+        self.silenceLabel.setStyleSheet("color: #e6e6f0;")
+        self.silenceLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        statsLayout.addWidget(self.silenceLabel)
+
+        # add sample rate label
+        self.sampleRateLabel = QLabel()
+        self.sampleRateLabel.setText("Sample Rate: 0 Hz")
+        self.sampleRateLabel.setFont(QFont("Arial", 14))
+        self.sampleRateLabel.setStyleSheet("color: #e6e6f0;")
+        self.sampleRateLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        statsLayout.addWidget(self.sampleRateLabel)
+
+        self.updateBasicStats()  # Initialize with dummy values
         return self.statsContainer
     
     def pitchUI(self):
@@ -57,6 +104,46 @@ class AnalyzeWindow(QWidget):
         titleLabel.setStyleSheet("color: #e6e6f0; font-weight: bold;")
         titleLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         pitchLayout.addWidget(titleLabel)
+
+        # add average fundamental frequency label
+        self.avgF0Label = QLabel()
+        self.avgF0Label.setText("Average Fundamental Frequency: 0.0 Hz")
+        self.avgF0Label.setFont(QFont("Arial", 14))
+        self.avgF0Label.setStyleSheet("color: #e6e6f0;")
+        self.avgF0Label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        pitchLayout.addWidget(self.avgF0Label)
+
+        # add fundamental frequency range label
+        self.f0RangeLabel = QLabel()
+        self.f0RangeLabel.setText("Fundamental Frequency Range: 0.0 Hz - 0.0 Hz")
+        self.f0RangeLabel.setFont(QFont("Arial", 14))
+        self.f0RangeLabel.setStyleSheet("color: #e6e6f0;")
+        self.f0RangeLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        pitchLayout.addWidget(self.f0RangeLabel)
+
+        # add pitch standard deviation label
+        self.pitchStdDevLabel = QLabel()
+        self.pitchStdDevLabel.setText("Pitch Standard Deviation: 0.0 Hz")
+        self.pitchStdDevLabel.setFont(QFont("Arial", 14))
+        self.pitchStdDevLabel.setStyleSheet("color: #e6e6f0;")
+        self.pitchStdDevLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        pitchLayout.addWidget(self.pitchStdDevLabel)
+
+        # add voiced/unvoiced ratio label
+        self.voicedRatioLabel = QLabel()
+        self.voicedRatioLabel.setText("Voiced/Unvoiced Ratio: 0.0")
+        self.voicedRatioLabel.setFont(QFont("Arial", 14))
+        self.voicedRatioLabel.setStyleSheet("color: #e6e6f0;")
+        self.voicedRatioLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        pitchLayout.addWidget(self.voicedRatioLabel)
+
+        # add pitch jitter label
+        self.pitchJitterLabel = QLabel()
+        self.pitchJitterLabel.setText("Pitch Jitter: 0.0%")
+        self.pitchJitterLabel.setFont(QFont("Arial", 14))
+        self.pitchJitterLabel.setStyleSheet("color: #e6e6f0;")
+        self.pitchJitterLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+        pitchLayout.addWidget(self.pitchJitterLabel)
 
         return self.pitchContainer
     
@@ -75,3 +162,62 @@ class AnalyzeWindow(QWidget):
        fluencyLayout.addWidget(titleLabel)
 
        return self.fluencyContainer
+
+    def updateBasicStats(self):
+        if self.signal is not None and self.samplerate:
+            self.setTimeLabel()
+            self.setEnergyLabel()
+            self.setZCRLabel()
+            self.setSilenceLabel()
+            self.setSampleRateLabel()
+    
+    def updatePitchStats(self):
+        if self.signal is not None and self.samplerate:
+            self.setAverageF0Label()
+            self.setF0RangeLabel()
+            self.setPitchStdDevLabel()
+            self.setVoicedRatioLabel()
+            self.setPitchJitterLabel()
+    
+    def setTimeLabel(self):
+        if self.signal is not None and self.samplerate:
+            duration = len(self.signal) / self.samplerate
+            hours = int(duration // 3600)
+            minutes = int((duration % 3600) // 60)
+            seconds = int(duration % 60)
+            self.timeLabel.setText(f"Time: {hours:02}:{minutes:02}:{seconds:02}")
+    
+    def setEnergyLabel(self):
+        if self.signal is not None and self.samplerate:
+            energy = np.mean(self.signal ** 2)
+            energy_db = 10 * np.log10(energy + 1e-10)  # Avoid log(0)
+            self.energyLabel.setText(f"Average Energy: {energy_db:.2f} dB")
+
+    def setZCRLabel(self):
+        if self.signal is not None and self.samplerate:
+            zcr = librosa.feature.zero_crossing_rate(y = self.signal, frame_length=2048, hop_length=256)
+            avg_zcr = np.mean(zcr)
+            self.zcrLabel.setText(f"Zero Crossing Rate: {avg_zcr:.4f}")
+    
+    def setSilenceLabel(self):
+        if self.signal is not None and self.samplerate:
+            silence_percentage = self.audioProcessor.compute_silence()
+            self.silenceLabel.setText(f"Silence Percentage: {silence_percentage:.2f}%")
+    
+    def setSampleRateLabel(self):
+        self.sampleRateLabel.setText(f"Sample Rate: {self.samplerate} Hz")
+
+    def setAverageF0Label(self):
+        pass
+
+    def setF0RangeLabel(self):
+        pass
+
+    def setPitchStdDevLabel(self):
+        pass
+
+    def setVoicedRatioLabel(self):
+        pass
+
+    def setPitchJitterLabel(self):
+        pass
