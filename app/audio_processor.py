@@ -63,3 +63,15 @@ class AudioProcessor:
         threshold_value = 1e-2 #np.percentile(energy, 3)
         silence = np.mean(energy < threshold_value) * 100
         return silence
+    
+    def getTime(self):
+        # Check if the audio signal is loaded
+        if self.signal is None:
+            raise ValueError("Audio signal not loaded. Please load an audio file first.")
+        
+        # Calculate duration in seconds
+        duration = len(self.signal) / self.sample_rate
+        hours = int(duration // 3600)
+        minutes = int((duration % 3600) // 60)
+        seconds = int(duration % 60)
+        return hours, minutes, seconds

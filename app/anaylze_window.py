@@ -181,10 +181,7 @@ class AnalyzeWindow(QWidget):
     
     def setTimeLabel(self):
         if self.signal is not None and self.samplerate:
-            duration = len(self.signal) / self.samplerate
-            hours = int(duration // 3600)
-            minutes = int((duration % 3600) // 60)
-            seconds = int(duration % 60)
+            hours,minutes,seconds = self.audioProcessor.getTime()
             self.timeLabel.setText(f"Time: {hours:02}:{minutes:02}:{seconds:02}")
     
     def setEnergyLabel(self):
