@@ -75,3 +75,54 @@ class AudioProcessor:
         minutes = int((duration % 3600) // 60)
         seconds = int(duration % 60)
         return hours, minutes, seconds
+    
+    def avg_fundamental_freq(self, f0):
+        # Check if the f0 array is provided
+        if f0 is None or len(f0) == 0:
+            raise ValueError("Fundamental frequency array is empty or not provided.")
+        
+        # Calculate the average fundamental frequency
+        avg_f0 = np.nanmean(f0)
+        return avg_f0
+    
+    def f0_range(self, f0):
+        # Check if the f0 array is provided
+        if f0 is None or len(f0) == 0:
+            raise ValueError("Fundamental frequency array is empty or not provided.")
+        
+        # Calculate the range of fundamental frequency
+        f0_min = np.nanmin(f0)
+        f0_max = np.nanmax(f0)
+        return f0_min, f0_max
+    
+    def f0_std_dev(self, f0):
+        # Check if the f0 array is provided
+        if f0 is None or len(f0) == 0:
+            raise ValueError("Fundamental frequency array is empty or not provided.")
+        
+        # Calculate the standard deviation of fundamental frequency
+        f0_std = np.nanstd(f0)
+        return f0_std
+    
+    def voiced_ratio(self, voiced_flag):
+        # Check if the voiced_flag array is provided
+        if voiced_flag is None or len(voiced_flag) == 0:
+            raise ValueError("Voiced flag array is empty or not provided.")
+        
+        # Calculate the ratio of voiced frames
+        voiced_ratio = np.mean(voiced_flag)
+        return voiced_ratio
+    
+    def pitch_jitter(self, f0):
+        # Check if the f0 array is provided
+        if f0 is None or len(f0) == 0:
+            raise ValueError("Fundamental frequency array is empty or not provided.")
+        
+        # Calculate the jitter (pitch variation)
+        voiced_f0 = f0[~np.isnan(f0)]
+        if len(voiced_f0) < 2:
+            return 0.0
+        
+        diffs = np.abs(np.diff(voiced_f0))
+        jitter = np.mean(diffs) / np.mean(voiced_f0) * 100
+        return jitter

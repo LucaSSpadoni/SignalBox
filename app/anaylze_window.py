@@ -15,6 +15,14 @@ class AnalyzeWindow(QWidget):
         self.samplerate = samplerate
         self.audioProcessor = AudioProcessor(signal = signal, sample_rate = samplerate)
 
+        if signal is not None:
+            self.times, self.f0, self.voiced_flag, self.voiced_probs = self.audioProcessor.comp_fund_freq()
+        else:
+            self.times = None
+            self.f0 = None
+            self.voiced_flag = None
+            self.voiced_probs = None
+
         # Set window properties
         self.setWindowTitle("Analyze Window")
         self.setGeometry(200, 200, 900, 600)
@@ -145,6 +153,7 @@ class AnalyzeWindow(QWidget):
         self.pitchJitterLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
         pitchLayout.addWidget(self.pitchJitterLabel)
 
+        self.updatePitchStats()  # Initialize with dummy values
         return self.pitchContainer
     
     def fluencyUI(self):
@@ -205,16 +214,24 @@ class AnalyzeWindow(QWidget):
         self.sampleRateLabel.setText(f"Sample Rate: {self.samplerate} Hz")
 
     def setAverageF0Label(self):
-        pass
+        avg_f0 = self.audioProcessor.avg_fundamental_freq(self.f0)
+        self.avgF0Label.setText(f"Average Fundamental Frequency: {avg_f0:.2f} Hz")
 
     def setF0RangeLabel(self):
-        pass
+        f0_min, f0_max = self.audioProcessor.f0_range(self.f0)
+        self.f0RangeLabel.setText(f"Fundamental Frequency Range: {f0_min:.2f} Hz - {f0_max:.2f} Hz")
 
     def setPitchStdDevLabel(self):
-        pass
+        if self.f0 is not None:
+            pitch_std_dev = np.nanstd(self.f0)
+            self.pitchStdDevLabel.setText(f"Pitch Standard Deviation: {pitch_std_dev:.2f} Hz")
+        else:
+            self.pitchStdDevLabel.setText("Pitch Standard Deviation: N/A")
 
     def setVoicedRatioLabel(self):
-        pass
+        voiced_ratio = self.audioProcessor.voiced_ratio(self.voiced_flag)
+        self.voicedRatioLabel.setText(f"Voiced/Unvoiced Ratio: {voiced_ratio:.2f}")
 
     def setPitchJitterLabel(self):
-        pass
+        jitter = self.audioProcessor.pitch_jitter(self.f0)
+        self.pitchJitterLabel.setText(f"Pitch Jitter: {jitter:.2f}%") if jitter is not None else self.pitchJitterLabel.setText("Pitch Jitter: N/A")
