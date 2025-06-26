@@ -170,6 +170,47 @@ class AnalyzeWindow(QWidget):
        titleLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
        fluencyLayout.addWidget(titleLabel)
 
+       # add pitch breaks label
+       self.pitchBreaksLabel = QLabel()
+       self.pitchBreaksLabel.setText("Pitch Breaks: N/A")
+       self.pitchBreaksLabel.setFont(QFont("Arial", 14))
+       self.pitchBreaksLabel.setStyleSheet("color: #e6e6f0;")
+       self.pitchBreaksLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+       fluencyLayout.addWidget(self.pitchBreaksLabel)
+
+       # add median F0 label
+       self.medianF0Label = QLabel()
+       self.medianF0Label.setText("Median F0: N/A")
+       self.medianF0Label.setFont(QFont("Arial", 14))
+       self.medianF0Label.setStyleSheet("color: #e6e6f0;")
+       self.medianF0Label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+       fluencyLayout.addWidget(self.medianF0Label)
+
+       # add mean pitch slope label
+       self.meanPitchSlopeLabel = QLabel()
+       self.meanPitchSlopeLabel.setText("Mean Pitch Slope: N/A")
+       self.meanPitchSlopeLabel.setFont(QFont("Arial", 14))
+       self.meanPitchSlopeLabel.setStyleSheet("color: #e6e6f0;")
+       self.meanPitchSlopeLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+       fluencyLayout.addWidget(self.meanPitchSlopeLabel)
+
+       # add voicing duration label
+       self.voicingDurationLabel = QLabel()
+       self.voicingDurationLabel.setText("Voicing Duration: N/A")
+       self.voicingDurationLabel.setFont(QFont("Arial", 14))
+       self.voicingDurationLabel.setStyleSheet("color: #e6e6f0;")
+       self.voicingDurationLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+       fluencyLayout.addWidget(self.voicingDurationLabel)
+
+       # add curve smoothness label
+       self.curveSmoothnessLabel = QLabel()
+       self.curveSmoothnessLabel.setText("Curve Smoothness: N/A")
+       self.curveSmoothnessLabel.setFont(QFont("Arial", 14))
+       self.curveSmoothnessLabel.setStyleSheet("color: #e6e6f0;")
+       self.curveSmoothnessLabel.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+       fluencyLayout.addWidget(self.curveSmoothnessLabel)
+
+       self.updateFluencyStats()
        return self.fluencyContainer
 
     def updateBasicStats(self):
@@ -187,7 +228,30 @@ class AnalyzeWindow(QWidget):
             self.setPitchStdDevLabel()
             self.setVoicedRatioLabel()
             self.setPitchJitterLabel()
+
+    def updateFluencyStats(self):
+        if self.signal is not None and self.samplerate:
+            self.pitchBreaks()
+            self.medianF0()
+            self.meanPitchSlope()
+            self.voicingDuration()
+            self.curveSmoothness()
     
+    def pitchBreaks(self):
+        pass
+
+    def medianF0(self):
+        pass
+
+    def meanPitchSlope(self):
+        pass
+
+    def voicingDuration(self):
+        pass
+
+    def curveSmoothness(self):
+        pass
+
     def setTimeLabel(self):
         if self.signal is not None and self.samplerate:
             hours,minutes,seconds = self.audioProcessor.getTime()
