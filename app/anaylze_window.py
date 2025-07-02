@@ -180,7 +180,7 @@ class AnalyzeWindow(QWidget):
 
        # add median F0 label
        self.medianF0Label = QLabel()
-       self.medianF0Label.setText("Median F0: N/A")
+       self.medianF0Label.setText("Median Fundamental Frequency: N/A")
        self.medianF0Label.setFont(QFont("Arial", 14))
        self.medianF0Label.setStyleSheet("color: #e6e6f0;")
        self.medianF0Label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)

@@ -1,5 +1,7 @@
 import librosa
 import numpy as np
+from sklearn.metrics import r2_score
+from numpy.polynomial import Polynomial
 
 class AudioProcessor:
     def __init__(self, audio_file = None, signal=None, sample_rate=None):
@@ -126,3 +128,57 @@ class AudioProcessor:
         diffs = np.abs(np.diff(voiced_f0))
         jitter = np.mean(diffs) / np.mean(voiced_f0) * 100
         return jitter
+    
+    def pitch_breaks(self, f0):
+        # Check if the f0 array is provided
+        if f0 is None or len(f0) == 0:
+            raise ValueError("Fundamental frequency array is empty or not provided.")
+        
+        voiced_flag = ~np.isnan(f0) & (f0 > 0)
+        return int(np.sum(np.abs(np.diff(voiced_flag.astype(int)))))
+    
+    def median_F0(self, f0):
+        # Check if the f0 array is provided
+        if f0 is None or len(f0) == 0:
+            raise ValueError("Fundamental frequency array is empty or not provided.")
+        
+        # Calculate the median fundamental frequency
+        median_f0 = np.nanmedian(f0)
+        return median_f0
+    
+    def mean_pitch_slope(self, f0):
+        # Check if the f0 array is provided
+        if f0 is None or len(f0) == 0:
+            raise ValueError("Fundamental frequency array is empty or not provided.")
+        
+        voiced_f0 = f0[~np.isnan(f0) & (f0 > 0)]
+        if len(voiced_f0) < 2:
+            return 0.0
+    
+        slope = np.mean(np.abs(np.diff(voiced_f0)))
+        return slope
+    
+    def voicing_duration(self, voiced_flag):
+        # Check if the voiced_flag array is provided
+        if voiced_flag is None or len(voiced_flag) == 0:
+            raise ValueError("Voiced flag array is empty or not provided.")
+        
+        # Calculate the voicing duration
+        voiced_duration = np.sum(voiced_flag) / len(voiced_flag) * 100
+        return voiced_duration
+    
+    def curve_smoothness(self, f0):
+        # Check if the f0 array is provided
+        if f0 is None or len(f0) == 0:
+            raise ValueError("Fundamental frequency array is empty or not provided.")
+        
+        voiced = ~np.isnan(f0) & (f0 > 0)
+        voiced_f0 = f0[voiced]
+        indices = np.where(voiced)[0]
+    
+        if len(voiced_f0) < 4:
+            return 0.0
+    
+        poly = Polynomial.fit(indices, voiced_f0, deg=3)
+        r2 = r2_score(voiced_f0, poly(indices))
+        return float(r2)
