@@ -261,13 +261,14 @@ class AnalyzeWindow(QWidget):
     def voicingDuration(self):
         if self.voiced_flag is not None:
             voiced_duration = self.audioProcessor.voicing_duration(self.voiced_flag)
-            self.voicingDurationLabel.setText(f"Voicing Duration: {voiced_duration:.2f}%")
+            self.voicingDurationLabel.setText(f"Voicing Duration: {voiced_duration:.2f} seconds")
         else:
             self.voicingDurationLabel.setText("Voicing Duration: N/A")
 
     def curveSmoothness(self):
         if self.f0 is not None:
             r2 = self.audioProcessor.curve_smoothness(self.f0)
+            self.curveSmoothnessLabel.setText(f"Curve Smoothness: {r2:.2f}")
         else:
             self.curveSmoothnessLabel.setText("Curve Smoothness: N/A")
 

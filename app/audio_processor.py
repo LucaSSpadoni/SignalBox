@@ -164,8 +164,9 @@ class AudioProcessor:
             raise ValueError("Voiced flag array is empty or not provided.")
         
         # Calculate the voicing duration
-        voiced_duration = np.sum(voiced_flag) / len(voiced_flag) * 100
-        return voiced_duration
+        num_voiced_frames = np.sum(voiced_flag)
+        duration = (num_voiced_frames * 256) / self.sample_rate
+        return duration
     
     def curve_smoothness(self, f0):
         # Check if the f0 array is provided
