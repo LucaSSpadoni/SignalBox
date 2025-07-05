@@ -4,7 +4,6 @@ from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import QSizePolicy
 from app.spectrogram_page import SpectrogramPage
-from app.pitch_shifter_page import PitchShifterPage
 from app.pitch_contour import PitchContourPage
 
 class MainWindow(QMainWindow):
@@ -39,7 +38,6 @@ class MainWindow(QMainWindow):
         stack = QStackedWidget()
         stack.addWidget(SpectrogramPage())
         stack.addWidget(PitchContourPage())
-        stack.addWidget(PitchShifterPage())
         return stack
 
     def createNavBar(self):
@@ -52,7 +50,7 @@ class MainWindow(QMainWindow):
 
         navLayout.addWidget(self.titleLabel("SignalBox"), alignment=Qt.AlignLeft)
 
-        for i, page in enumerate(["Static Visualizer", "Pitch Contour","Pitch Shifter"]):
+        for i, page in enumerate(["Static Visualizer", "Pitch Contour"]):
             button = QPushButton(page)
             button.setStyleSheet("color: #e6e6f0; font-weight: bold;")
             button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)

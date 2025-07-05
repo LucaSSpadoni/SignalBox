@@ -238,19 +238,38 @@ class AnalyzeWindow(QWidget):
             self.curveSmoothness()
     
     def pitchBreaks(self):
-        pass
+        if self.f0 is not None:
+            breaks = self.audioProcessor.pitch_breaks(self.f0)
+            self.pitchBreaksLabel.setText(f"Pitch Breaks: {breaks}")
+        else:
+            self.pitchBreaksLabel.setText("Pitch Breaks: N/A")
 
     def medianF0(self):
-        pass
+        if self.f0 is not None:
+            median_f0 = self.audioProcessor.median_F0(self.f0)
+            self.medianF0Label.setText(f"Median Fundamental Frequency: {median_f0:.2f} Hz")
+        else:
+            self.medianF0Label.setText("Median Fundamental Frequency: N/A")
 
     def meanPitchSlope(self):
-        pass
+        if self.f0 is not None:
+            slope = self.audioProcessor.mean_pitch_slope(self.f0)
+            self.meanPitchSlopeLabel.setText(f"Mean Pitch Slope: {slope:.2f} Hz/s")
+        else:
+            self.meanPitchSlopeLabel.setText("Mean Pitch Slope: N/A")
 
     def voicingDuration(self):
-        pass
+        if self.voiced_flag is not None:
+            voiced_duration = self.audioProcessor.voicing_duration(self.voiced_flag)
+            self.voicingDurationLabel.setText(f"Voicing Duration: {voiced_duration:.2f}%")
+        else:
+            self.voicingDurationLabel.setText("Voicing Duration: N/A")
 
     def curveSmoothness(self):
-        pass
+        if self.f0 is not None:
+            r2 = self.audioProcessor.curve_smoothness(self.f0)
+        else:
+            self.curveSmoothnessLabel.setText("Curve Smoothness: N/A")
 
     def setTimeLabel(self):
         if self.signal is not None and self.samplerate:
