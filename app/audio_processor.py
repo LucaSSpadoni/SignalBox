@@ -83,6 +83,10 @@ class AudioProcessor:
         if f0 is None or len(f0) == 0:
             raise ValueError("Fundamental frequency array is empty or not provided.")
         
+
+        # avoid NaN values in f0
+        valid_f0 = f0[~np.isnan(f0)]
+        
         # Calculate the average fundamental frequency
         avg_f0 = np.nanmean(f0)
         return avg_f0

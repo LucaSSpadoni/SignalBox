@@ -6,6 +6,12 @@ import numpy as np
 from app.audio_processor import AudioProcessor
 import pytest
 
+##### Test Audio #####
+def generate_test_signal(frequency=440, duration=1.0, sample_rate=44100):
+    """Generate a test signal (sine wave) for testing purposes."""
+    t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+    signal = 0.5 * np.sin(2 * np.pi * frequency * t)  # Amplitude of 0.5
+    return signal, sample_rate
 
 ##### Preprocessor Tests #####
 def test_load_audio():
@@ -31,11 +37,7 @@ def test_frames_to_array():
     assert np.all(np.abs(signal)) <= 1.0, "Signal should be scaled"
 
 def test_comp_fund_freq():
-    sample_rate = 16000
-    duration = 1  # seconds
-    t = np.linspace(0, duration, sample_rate * duration, endpoint=False)
-    signal = 0.5 * np.sin(2 * np.pi * 440 * t)  # 440 Hz sine wave
-
+    signal, sample_rate = generate_test_signal()
     ap = AudioProcessor(signal=signal, sample_rate=sample_rate)
     times, f0, voiced_flag, voiced_probs = ap.comp_fund_freq()
 
@@ -50,28 +52,79 @@ def test_comp_fund_freq():
 
 ##### Stats Tests #####
 def test_compute_silence():
-    pass
+    signal, sample_rate = generate_test_signal()
+    ap = AudioProcessor(signal=signal, sample_rate=sample_rate)
+    silence_percentage = ap.compute_silence()
+    assert isinstance(silence_percentage, float), "Silence percentage should be a float"
+    assert 0 <= silence_percentage <= 100, "Silence percentage should be between 0 and 100"
 
 def test_avg_f0():
-    pass
+    f0 = np.array([100, 200, 300, 400, 500, np.nan])
+    ap = AudioProcessor(signal=None, sample_rate=16000)
+    avg_f0 = ap.avg_fundamental_freq(f0)
+    assert isinstance(avg_f0, float), "Average fundamental frequency should return a float"
+    assert not np.isnan(avg_f0), "Average fundamental frequency should not be NaN"
+    assert np.nanmin(f0) <= avg_f0 <= np.nanmax(f0), "Average fundamental frequency should be within the range of f0 values"
 
 def test_f0_range():
-    pass
+    f0 = np.array([100, 200, 300, 400, 500, np.nan])
+    ap = AudioProcessor(signal=None, sample_rate=16000)
+    f0_min, f0_max = ap.f0_range(f0)
+    assert isinstance(f0_min, float), "F0 range should return a float"
+    assert isinstance(f0_max, float), "F0 range should return a float"
+    assert f0_min >= 0, "F0 range should be non-negative"
+    assert f0_max >= f0_min, "F0 max should be greater than or equal to F0 min"
+    assert np.isclose(f0_min, np.nanmin(f0)), "F0 min should match the minimum of f0 array"
+    assert np.isclose(f0_max, np.nanmax(f0)), "F0 max should match the maximum of f0 array"
 
 def test_f0_std():
-    pass
+    signal, sample_rate = generate_test_signal()
+    ap = AudioProcessor(signal=signal, sample_rate=sample_rate)
+    times, f0, voiced_flag, voiced_probs = ap.comp_fund_freq()
+    f0_std = ap.f0_std_dev(f0)
+    assert isinstance(f0_std, float), "F0 standard deviation should return a float"
+    assert f0_std >= 0, "F0 standard deviation should be non-negative"
+    assert not np.isnan(f0_std), "F0 standard deviation should not be NaN"
+    assert np.isclose(f0_std, np.nanstd(f0)), "F0 standard deviation should match the standard deviation of f0 array"
 
 def test_voiced_ratio():
-    pass
+    signal, sample_rate = generate_test_signal()
+    ap = AudioProcessor(signal=signal, sample_rate=sample_rate)
+    times, f0, voiced_flag, voiced_probs = ap.comp_fund_freq()
+    voiced_ratio = ap.voiced_ratio(voiced_flag)
+    assert isinstance(voiced_ratio, float), "Voiced ratio should return a float"
+    assert 0 <= voiced_ratio <= 1, "Voiced ratio should be between 0 and 1"
+    assert not np.isnan(voiced_ratio), "Voiced ratio should not be NaN"
+    assert np.isclose(voiced_ratio, np.mean(voiced_flag)), "Voiced ratio should match the mean of voiced_flag array"
 
 def test_pitch_breaks():
-    pass
+    signal, sample_rate = generate_test_signal()
+    ap = AudioProcessor(signal=signal, sample_rate=sample_rate)
+    times, f0, voiced_flag, voiced_probs = ap.comp_fund_freq()
+    breaks = ap.pitch_breaks(f0)
+    assert isinstance(breaks, int), "Pitch breaks should return an integer"
+    assert breaks >= 0, "Pitch breaks should be non-negative"
+    assert breaks <= (len(f0) - 1), "Pitch breaks should not exceed the length of f0 array minus one"
 
 def test_median_f0():
-    pass
+    signal, sample_rate = generate_test_signal()
+    ap = AudioProcessor(signal=signal, sample_rate=sample_rate)
+    times, f0, voiced_flag, voiced_probs = ap.comp_fund_freq()
+    median_f0 = ap.median_F0(f0)
+    assert isinstance(median_f0, float), "Median F0 should return a float"
+    assert not np.isnan(median_f0), "Median F0 should not be NaN"
+    assert median_f0 >= 0, "Median F0 should be non-negative"
+    assert np.isclose(median_f0, np.nanmedian(f0)), "Median F0 should match the median of f0 array"
 
 def test_mean_pitch_slope():
-    pass
+    signal, sample_rate = generate_test_signal()
+    ap = AudioProcessor(signal=signal, sample_rate=sample_rate)
+    times, f0, voiced_flag, voiced_probs = ap.comp_fund_freq()
+    slope = ap.mean_pitch_slope(f0)
+    assert isinstance(slope, float), "Mean pitch slope should return a float"
+    assert not np.isnan(slope), "Mean pitch slope should not be NaN"
+    assert slope >= 0, "Mean pitch slope should be non-negative due to calculating absolute values"
+    assert np.isclose(slope, np.mean(np.abs(np.diff(f0))), rtol=1e-5), "Mean pitch slope should match the mean of absolute differences in f0 array"
 
 def test_pitch_jitter():
     f0 = np.array([100, 105, 110, 115, 120, 125, np.nan])
