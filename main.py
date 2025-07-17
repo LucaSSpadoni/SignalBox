@@ -9,5 +9,7 @@ def main():
     window.show()
     sys.exit(app.exec())
 
-
-main()
+if __name__ == "__main__":
+    # Run the main function to start the application
+    # This is the entry point of the application
+    main()

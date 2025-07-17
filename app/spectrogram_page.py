@@ -252,7 +252,7 @@ class SpectrogramPage(QWidget):
     def openFileDialog(self):
         # Open file dialog to select audio file
         options = QFileDialog.Options()
-        fileName, _ = QFileDialog.getOpenFileName(self, "Open Audio File", "", "Audio Files (*.wav *.mp3);;All Files (*)", options=options)
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Audio File", "", "Audio Files (*.wav *.mp3 *.flac);;All Files (*)", options=options)
         if fileName:
             print(f"Selected file: {fileName}")
             self.audioPath = fileName

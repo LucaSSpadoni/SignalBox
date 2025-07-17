@@ -50,7 +50,7 @@ class MainWindow(QMainWindow):
 
         navLayout.addWidget(self.titleLabel("SignalBox"), alignment=Qt.AlignLeft)
 
-        for i, page in enumerate(["Static Visualizer", "Pitch Contour"]):
+        for i, page in enumerate(["Sprectrogram Visualizer", "Pitch Contour"]):
             button = QPushButton(page)
             button.setStyleSheet("color: #e6e6f0; font-weight: bold;")
             button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
