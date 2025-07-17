@@ -1,6 +1,52 @@
-venv/
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
+*.py[cod]
+*.so
+
+# Virtual environment
+venv/
+.env/
+
+# macOS system files
 .DS_Store
+
+# VS Code settings
 .vscode/
-.idea/
+
+# Build and distribution folders
+build/
+dist/
+*.egg-info/
+*.spec
+
+# macOS app bundle
+*.app
+
+# Installer archives
+*.dmg
+*.exe
+*.zip
+*.tar.gz
+*.pkg
+
+# Log and cache files
+*.log
+*.cache
+
+# Icon files (only if not needed in repo)
+*.icns
+*.ico
+
+# Test coverage
+htmlcov/
+.coverage
+coverage.xml
+
+# PyInstaller/py2app output
+__pyinstaller__/
+*.manifest
+*.spec
+
+# Unit test & pytest artifacts
+.pytest_cache/
+*.cover
