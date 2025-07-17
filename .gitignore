@@ -1,52 +1,80 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 *.so
 
-# Virtual environment
+# Virtual environments
 venv/
-.env/
+.venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.spec
+
+# Installer logs
+*.log
 
 # macOS system files
 .DS_Store
+.AppleDouble
+.LSOverride
 
-# VS Code settings
-.vscode/
+# Thumbnails
+._*
 
-# Build and distribution folders
-build/
-dist/
-*.egg-info/
-*.spec
+# Icon?
+Icon
 
-# macOS app bundle
+# macOS metadata
+.Spotlight-V100
+.Trashes
+
+# App bundles
 *.app
 
-# Installer archives
-*.dmg
-*.exe
+# Archive builds
 *.zip
 *.tar.gz
+*.dmg
 *.pkg
 
-# Log and cache files
-*.log
-*.cache
+# GitHub-related
+*.swp
+*.swo
 
-# Icon files (only if not needed in repo)
-*.icns
-*.ico
+# Editor/IDE
+.vscode/
+.idea/
 
-# Test coverage
+# Coverage/testing
 htmlcov/
 .coverage
 coverage.xml
-
-# PyInstaller/py2app output
-__pyinstaller__/
-*.manifest
-*.spec
-
-# Unit test & pytest artifacts
-.pytest_cache/
 *.cover
+*.py,cover
+.cache
+nosetests.xml
+*.pytest_cache/
+junit-*.xml
+
+# Jupyter
+.ipynb_checkpoints
+
+# Misc
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# Personal ignore
+*.iml
+*.sublime-workspace
+*.sublime-project
+*.ico
+*.icon
+*.icns
