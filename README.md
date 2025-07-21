@@ -1,12 +1,12 @@
 # 🎛 SignalBox - Audio Spectrogram & Voice Analysis Tool
 
-SignalBox is a macOS desktop application that visualizes audio spectrograms, pitch contours, and speech-related analysis metrics from microphone recordings or uploaded audio files. It processes input after recording or selection (not in real time).
+SignalBox is a desktop application that visualizes audio spectrograms and pitch contours that come with speech-related analysis metrics from microphone recordings or uploaded audio files.
 
 ---
 
 ## ✨ Features
 
-- **Spectrograms**: View full-spectrum audio analysis after loading or recording.
+- **Spectrograms**: Visualize the full-frequency content of audio files or microphone recordings.
 - **Pitch Contours**: Extract and display fundamental frequency (F0).
 - **Voice Analysis Tools**: Evaluate speech characteristics such as voicing, pitch dynamics, and contour consistency.
 - **Mic & File Input**: Supports `.wav`, `.mp3`, `.flac`.
@@ -15,13 +15,11 @@ SignalBox is a macOS desktop application that visualizes audio spectrograms, pit
 
 ---
 
-## 🚀 Setup (macOS)
+## 🚀 Setup
 
 ### Prerequisites
 
-- macOS 12+
-- Python 3.11 or 3.13
-- Git, pip
+- Python 3.11 or later
 
 ### Steps
 
@@ -29,16 +27,16 @@ SignalBox is a macOS desktop application that visualizes audio spectrograms, pit
 git clone https://github.com/LucaSSpadoni/SignalBox.git
 cd SignalBox
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\\Scripts\\activate
 pip install -r requirements.txt
-python3 main.py
+python main.py
+
 ```
 
 ---
 
 ## 📸 Example Output
 
-> Replace these placeholders with real screenshots when ready
 
 ### 🎙 Spectrogram View
 ![Spectrogram](assets/spectrogram.png)
