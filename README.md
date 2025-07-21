@@ -7,7 +7,7 @@ SignalBox is a desktop application that visualizes audio spectrograms and pitch 
 ## ✨ Features
 
 - **Spectrograms**: Visualize the full-frequency content of audio files or microphone recordings.
-- **Pitch Contours**: Extract and display fundamental frequency (F0).
+- **Pitch Contours**: Extract and display fundamental frequency.
 - **Voice Analysis Tools**: Evaluate speech characteristics such as voicing, pitch dynamics, and contour consistency.
 - **Mic & File Input**: Supports `.wav`, `.mp3`, `.flac`.
 - **Adjustable Settings**: Modify FFT size, hop length, and color map.
