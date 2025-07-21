@@ -41,13 +41,13 @@ python3 main.py
 > Replace these placeholders with real screenshots when ready
 
 ### 🎙 Spectrogram View
-![Spectrogram](screenshots/spectrogram.png)
+![Spectrogram](assets/spectrogram.png)
 
 ### 📈 Pitch Contour Overlay
-![Pitch](screenshots/contourplot.png)
+![Pitch](assets/contourplot.png)
 
 ### 📊 Analysis Metrics Panel
-![Metrics](screenshots/analysis.png)
+![Metrics](assets/analysis.png)
 
 ---
 
