@@ -1,3 +1,5 @@
+![Logo](signal-box_icon.ico)
+
 # SignalBox - Audio Spectrogram & Voice Analysis Tool
 
 SignalBox is a desktop application that visualizes audio spectrograms and pitch contours that come with speech-related analysis metrics from microphone recordings or uploaded audio files.
